@@ -1,0 +1,12 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Enums;
+
+enum AuthProvider: string
+{
+    case Local = 'local';
+    case Ldap = 'ldap';
+    case Keycloak = 'keycloak';
+}
