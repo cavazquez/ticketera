@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 class ImapInboundMailFetcher
 {
     public function __construct(
-        private InboundEmailParser $parser,
+        private readonly InboundEmailParser $parser,
     ) {}
 
     /**
@@ -48,7 +48,7 @@ class ImapInboundMailFetcher
             $messages = [];
             foreach ($messageNumbers as $uid) {
                 $message = $this->parseMessage($connection, (int) $uid);
-                if ($message !== null) {
+                if ($message instanceof IncomingEmailMessage) {
                     $messages[] = $message;
                     imap_setflag_full($connection, (string) $uid, '\\Seen', ST_UID);
                 }

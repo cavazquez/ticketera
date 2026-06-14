@@ -29,7 +29,9 @@ const formatDate = (value) => {
 
     <div class="min-h-screen bg-gray-50">
         <header class="border-b border-gray-200 bg-white">
-            <div class="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+            <div
+                class="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-4 sm:px-6"
+            >
                 <Link :href="route('help.index')" class="flex items-center gap-2">
                     <ApplicationLogo class="h-8 w-8 fill-current text-indigo-600" />
                     <span class="font-semibold text-gray-900">{{ t('help.title') }}</span>
@@ -39,10 +41,7 @@ const formatDate = (value) => {
         </header>
 
         <main class="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-            <Link
-                :href="route('help.index')"
-                class="text-sm text-indigo-600 hover:text-indigo-500"
-            >
+            <Link :href="route('help.index')" class="text-sm text-indigo-600 hover:text-indigo-500">
                 ← {{ t('common.back') }}
             </Link>
 
@@ -56,9 +55,7 @@ const formatDate = (value) => {
                     · {{ t('help.views', { count: article.view_count }) }}
                 </p>
 
-                <div
-                    class="prose prose-indigo mt-8 max-w-none whitespace-pre-wrap text-gray-800"
-                >
+                <div class="prose prose-indigo mt-8 max-w-none whitespace-pre-wrap text-gray-800">
                     {{ article.body }}
                 </div>
             </article>
@@ -72,7 +69,9 @@ const formatDate = (value) => {
                             class="block rounded-md bg-white px-4 py-3 shadow-sm hover:bg-indigo-50"
                         >
                             <span class="font-medium text-gray-900">{{ item.title }}</span>
-                            <p v-if="item.summary" class="text-sm text-gray-600">{{ item.summary }}</p>
+                            <p v-if="item.summary" class="text-sm text-gray-600">
+                                {{ item.summary }}
+                            </p>
                         </Link>
                     </li>
                 </ul>

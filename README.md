@@ -20,14 +20,14 @@ Abrí http://127.0.0.1:8000
 
 ## Servicios Docker
 
-| Servicio  | Contenedor        | Puerto | Descripción                         |
-| --------- | ----------------- | ------ | ----------------------------------- |
-| `mariadb` | ticketera-mariadb | 3307   | Base de datos                       |
-| `redis`   | ticketera-redis   | 6379   | Cache, sesiones y colas             |
+| Servicio  | Contenedor        | Puerto | Descripción                          |
+| --------- | ----------------- | ------ | ------------------------------------ |
+| `mariadb` | ticketera-mariadb | 3307   | Base de datos                        |
+| `redis`   | ticketera-redis   | 6379   | Cache, sesiones y colas              |
 | `app`     | ticketera-app     | —      | PHP-FPM (procesa requests vía Nginx) |
-| `nginx`   | ticketera-nginx   | 8000   | Servidor web                        |
-| `queue`   | ticketera-queue   | —      | Worker de colas (emails, etc.)      |
-| `vite`    | ticketera-vite    | 5173   | Frontend hot reload                 |
+| `nginx`   | ticketera-nginx   | 8000   | Servidor web                         |
+| `queue`   | ticketera-queue   | —      | Worker de colas (emails, etc.)       |
+| `vite`    | ticketera-vite    | 5173   | Frontend hot reload                  |
 
 ## Comandos útiles
 
@@ -66,14 +66,14 @@ Los correos de notificación se encolan en **Redis** y los procesa el servicio `
 
 Optimizaciones para uso intensivo incluidas por defecto en Docker:
 
-| Componente | Qué hace |
-| ---------- | -------- |
-| **Redis** | Cache de configuración, sesiones y colas (menos carga en MariaDB) |
-| **queue** | Worker que envía emails y tareas en background |
-| **Índices DB** | Filtros rápidos en la cola de tickets (`status`, `department`, `assigned_to`, `due_at`) |
-| **Secuencia atómica** | Números de ticket (`TKT-000001`) sin duplicados bajo concurrencia |
-| **Cache settings** | `Setting::current()` cacheado 5 min (se invalida al guardar en panel) |
-| **Nginx + PHP-FPM** | Múltiples workers PHP (hasta 20) en lugar del servidor embebido |
+| Componente            | Qué hace                                                                                |
+| --------------------- | --------------------------------------------------------------------------------------- |
+| **Redis**             | Cache de configuración, sesiones y colas (menos carga en MariaDB)                       |
+| **queue**             | Worker que envía emails y tareas en background                                          |
+| **Índices DB**        | Filtros rápidos en la cola de tickets (`status`, `department`, `assigned_to`, `due_at`) |
+| **Secuencia atómica** | Números de ticket (`TKT-000001`) sin duplicados bajo concurrencia                       |
+| **Cache settings**    | `Setting::current()` cacheado 5 min (se invalida al guardar en panel)                   |
+| **Nginx + PHP-FPM**   | Múltiples workers PHP (hasta 20) en lugar del servidor embebido                         |
 
 Ver logs del worker: `docker compose logs -f queue`
 

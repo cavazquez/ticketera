@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Cache;
 
 class Setting extends Model
 {
-    private const CACHE_KEY = 'settings.current';
+    private const string CACHE_KEY = 'settings.current';
 
-    private const CACHE_TTL_SECONDS = 300;
+    private const int CACHE_TTL_SECONDS = 300;
 
     protected static ?self $instance = null;
 
@@ -111,7 +111,7 @@ class Setting extends Model
 
     public static function current(): self
     {
-        if (static::$instance !== null) {
+        if (static::$instance instanceof Setting) {
             return static::$instance;
         }
 

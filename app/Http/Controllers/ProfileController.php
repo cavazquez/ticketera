@@ -17,7 +17,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
-        $user = $this->requireUser($request);
+        $this->requireUser($request);
 
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => true,

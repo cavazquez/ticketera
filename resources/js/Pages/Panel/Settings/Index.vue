@@ -80,22 +80,30 @@ const testingSmtp = ref(false);
 
 const testImap = () => {
     testingImap.value = true;
-    router.post(route('panel.settings.test-imap'), {}, {
-        preserveScroll: true,
-        onFinish: () => {
-            testingImap.value = false;
-        },
-    });
+    router.post(
+        route('panel.settings.test-imap'),
+        {},
+        {
+            preserveScroll: true,
+            onFinish: () => {
+                testingImap.value = false;
+            },
+        }
+    );
 };
 
 const testSmtp = () => {
     testingSmtp.value = true;
-    router.post(route('panel.settings.test-smtp'), {}, {
-        preserveScroll: true,
-        onFinish: () => {
-            testingSmtp.value = false;
-        },
-    });
+    router.post(
+        route('panel.settings.test-smtp'),
+        {},
+        {
+            preserveScroll: true,
+            onFinish: () => {
+                testingSmtp.value = false;
+            },
+        }
+    );
 };
 
 const submit = () => {
@@ -184,10 +192,7 @@ const submit = () => {
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     required
                                 >
-                                    <template
-                                        v-for="group in timezones"
-                                        :key="group.region"
-                                    >
+                                    <template v-for="group in timezones" :key="group.region">
                                         <optgroup :label="group.region">
                                             <option
                                                 v-for="option in group.options"
@@ -343,7 +348,10 @@ const submit = () => {
                                     <InputError class="mt-2" :message="form.errors.smtp_password" />
                                 </div>
                                 <div>
-                                    <InputLabel for="smtp_from_address" value="Remitente (opcional)" />
+                                    <InputLabel
+                                        for="smtp_from_address"
+                                        value="Remitente (opcional)"
+                                    />
                                     <TextInput
                                         id="smtp_from_address"
                                         v-model="form.smtp_from_address"
@@ -359,7 +367,10 @@ const submit = () => {
                             </div>
 
                             <div>
-                                <InputLabel for="smtp_from_name" value="Nombre del remitente (opcional)" />
+                                <InputLabel
+                                    for="smtp_from_name"
+                                    value="Nombre del remitente (opcional)"
+                                />
                                 <TextInput
                                     id="smtp_from_name"
                                     v-model="form.smtp_from_name"
@@ -478,7 +489,10 @@ const submit = () => {
                                     />
                                 </div>
                                 <div>
-                                    <InputLabel for="inbound_imap_password" value="Contraseña IMAP" />
+                                    <InputLabel
+                                        for="inbound_imap_password"
+                                        value="Contraseña IMAP"
+                                    />
                                     <TextInput
                                         id="inbound_imap_password"
                                         v-model="form.inbound_imap_password"

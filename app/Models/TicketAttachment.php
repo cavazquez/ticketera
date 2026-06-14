@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @property-read string $human_size
+ * @property-read string $download_url
+ */
 class TicketAttachment extends Model
 {
     protected $fillable = [

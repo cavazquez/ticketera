@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Ticket;
 use App\Services\ImapInboundMailFetcher;
 use App\Services\InboundEmailProcessor;
 use Illuminate\Console\Command;
@@ -18,7 +19,7 @@ class FetchIncomingEmail extends Command
         $processed = 0;
 
         foreach ($messages as $message) {
-            if ($processor->process($message) !== null) {
+            if ($processor->process($message) instanceof Ticket) {
                 $processed++;
             }
         }

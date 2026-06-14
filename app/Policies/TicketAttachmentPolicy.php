@@ -25,11 +25,7 @@ class TicketAttachmentPolicy
 
         $reply = $attachment->reply;
 
-        if ($reply?->is_internal && $user->isClient()) {
-            return false;
-        }
-
-        return true;
+        return ! ($reply?->is_internal && $user->isClient());
     }
 
     public function download(User $user, TicketAttachment $attachment): bool

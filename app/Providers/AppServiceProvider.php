@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
 use App\Models\Setting;
 use App\Services\MailConfigurator;
+use App\Support\LocaleManager;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Support\Facades\Cache;
@@ -84,7 +85,7 @@ class AppServiceProvider extends ServiceProvider
             $locale = Setting::current()->locale;
 
             if (filled($locale)) {
-                \App\Support\LocaleManager::apply($locale);
+                LocaleManager::apply($locale);
             }
         } catch (\Throwable) {
             //
@@ -93,20 +94,12 @@ class AppServiceProvider extends ServiceProvider
 
     private function configureRateLimiting(): void
     {
-        RateLimiter::for('ticket-creation', function (Request $request) {
-            return Limit::perMinute(10)->by($request->user()?->id ?: $request->ip());
-        });
+        RateLimiter::for('ticket-creation', fn (Request $request) => Limit::perMinute(10)->by($request->user()?->id ?: $request->ip()));
 
-        RateLimiter::for('ticket-replies', function (Request $request) {
-            return Limit::perMinute(30)->by($request->user()?->id ?: $request->ip());
-        });
+        RateLimiter::for('ticket-replies', fn (Request $request) => Limit::perMinute(30)->by($request->user()?->id ?: $request->ip()));
 
-        RateLimiter::for('registrations', function (Request $request) {
-            return Limit::perMinute(3)->by($request->ip());
-        });
+        RateLimiter::for('registrations', fn (Request $request) => Limit::perMinute(3)->by($request->ip()));
 
-        RateLimiter::for('password-reset', function (Request $request) {
-            return Limit::perMinute(3)->by($request->ip());
-        });
+        RateLimiter::for('password-reset', fn (Request $request) => Limit::perMinute(3)->by($request->ip()));
     }
 }

@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Enums\UserRole;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\SystemHealthService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class SystemHealthTest extends TestCase
@@ -55,7 +57,7 @@ class SystemHealthTest extends TestCase
             $this->markTestSkipped('IMAP está instalado en este entorno.');
         }
 
-        \App\Models\Setting::current()->update([
+        Setting::current()->update([
             'inbound_email_enabled' => true,
             'inbound_imap_host' => 'imap.test.local',
             'inbound_imap_username' => 'user',
@@ -73,8 +75,8 @@ class SystemHealthTest extends TestCase
 
     public function test_health_report_detects_active_queue_and_scheduler_heartbeats(): void
     {
-        \Illuminate\Support\Facades\Cache::put('system_health:queue_heartbeat', now()->timestamp, 300);
-        \Illuminate\Support\Facades\Cache::put('system_health:scheduler_heartbeat', (string) now()->timestamp, 300);
+        Cache::put('system_health:queue_heartbeat', now()->timestamp, 300);
+        Cache::put('system_health:scheduler_heartbeat', (string) now()->timestamp, 300);
 
         $report = app(SystemHealthService::class)->run();
 

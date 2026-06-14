@@ -23,12 +23,12 @@ class TimezoneOptions
 
         ksort($grouped);
 
-        return collect($grouped)
+        return array_values(collect($grouped)
             ->map(fn (array $options, string $region) => [
                 'region' => $region,
                 'options' => $options,
             ])
             ->values()
-            ->all();
+            ->all());
     }
 }

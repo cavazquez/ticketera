@@ -7,12 +7,11 @@ use App\Enums\UserRole;
 use App\Models\Setting;
 use App\Models\Ticket;
 use App\Models\User;
-use App\Services\TicketActivityLogger;
 
 class TicketSetupService
 {
     public function __construct(
-        private TicketActivityLogger $activityLogger,
+        private readonly TicketActivityLogger $activityLogger,
     ) {}
 
     public function configureNewTicket(Ticket $ticket): void

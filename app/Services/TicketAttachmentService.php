@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Ticket;
@@ -21,7 +23,7 @@ class TicketAttachmentService
     public function storeMany(Ticket $ticket, User $user, array $files, ?TicketReply $reply = null): void
     {
         foreach ($files as $file) {
-            if (! $file instanceof UploadedFile || ! $file->isValid()) {
+            if (! $file->isValid()) {
                 continue;
             }
 
@@ -33,7 +35,7 @@ class TicketAttachmentService
                 'disk' => 'local',
                 'path' => $path,
                 'original_name' => $file->getClientOriginalName(),
-                'mime_type' => $file->getClientMimeType() ?? 'application/octet-stream',
+                'mime_type' => $file->getClientMimeType() ?: 'application/octet-stream',
                 'size' => $file->getSize(),
             ]);
         }
@@ -48,7 +50,7 @@ class TicketAttachmentService
         ?TicketReply $reply = null,
     ): void {
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
-        $storedName = Str::uuid()->toString().($extension ? ".{$extension}" : '');
+        $storedName = Str::uuid()->toString().($extension !== '' && $extension !== '0' ? ".{$extension}" : '');
         $path = "attachments/tickets/{$ticket->id}/{$storedName}";
 
         Storage::disk('local')->put($path, $contents);

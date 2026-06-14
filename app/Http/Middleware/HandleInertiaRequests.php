@@ -41,8 +41,8 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user()?->loadMissing('department:id,name'),
             ],
             'locale' => fn () => app()->getLocale(),
-            'locales' => fn () => LocaleManager::labels(),
-            'translations' => fn () => LocaleManager::uiTranslations(),
+            'locales' => LocaleManager::labels(...),
+            'translations' => LocaleManager::uiTranslations(...),
             'appName' => fn () => $settings->app_name,
             'canRegister' => fn () => $settings->allow_public_registration,
             'turnstile' => fn () => [

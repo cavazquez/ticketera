@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TicketStatus;
 use App\Services\DashboardMetricsService;
 use App\Support\EnumOptions;
-use App\Enums\TicketStatus;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;

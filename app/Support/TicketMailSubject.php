@@ -6,7 +6,6 @@ namespace App\Support;
 
 use App\Models\Setting;
 use App\Models\Ticket;
-use App\Support\TicketReplyToken;
 use Illuminate\Notifications\Messages\MailMessage;
 
 final class TicketMailSubject

@@ -1,12 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Badge from '@/Components/Badge.vue';
-import {
-    priorityColor,
-    priorityLabels,
-    statusColor,
-    statusLabels,
-} from '@/utils/ticketLabels';
+import { priorityColor, priorityLabels, statusColor } from '@/utils/ticketLabels';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -32,10 +27,7 @@ const statusCount = (value) => props.metrics?.by_status?.[value] ?? 0;
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-                <div
-                    v-if="isClient"
-                    class="overflow-hidden rounded-lg bg-white p-6 shadow-sm"
-                >
+                <div v-if="isClient" class="overflow-hidden rounded-lg bg-white p-6 shadow-sm">
                     <p class="text-gray-900">¡Hola, {{ user.name }}!</p>
                     <p class="mt-2 text-sm text-gray-600">
                         <Link
@@ -66,7 +58,9 @@ const statusCount = (value) => props.metrics?.by_status?.[value] ?? 0;
                             <p class="text-sm text-gray-500">SLA vencidos</p>
                             <p
                                 class="mt-1 text-3xl font-semibold"
-                                :class="metrics.sla_overdue_count > 0 ? 'text-red-600' : 'text-gray-900'"
+                                :class="
+                                    metrics.sla_overdue_count > 0 ? 'text-red-600' : 'text-gray-900'
+                                "
                             >
                                 {{ metrics.sla_overdue_count }}
                             </p>
@@ -119,10 +113,7 @@ const statusCount = (value) => props.metrics?.by_status?.[value] ?? 0;
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-100">
-                                        <tr
-                                            v-for="dept in metrics.by_department"
-                                            :key="dept.id"
-                                        >
+                                        <tr v-for="dept in metrics.by_department" :key="dept.id">
                                             <td class="py-2 font-medium text-gray-900">
                                                 {{ dept.name }}
                                             </td>

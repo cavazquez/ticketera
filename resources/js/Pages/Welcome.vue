@@ -89,9 +89,7 @@ const features = computed(() => [
                         {{ appName }} {{ t('welcome.subtitle') }}
                     </p>
 
-                    <div
-                        class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
-                    >
+                    <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                         <Link
                             v-if="canLogin"
                             :href="route('login')"
@@ -144,22 +142,32 @@ const features = computed(() => [
                     <div
                         class="rounded-2xl border border-dashed border-indigo-200 bg-indigo-50/50 p-6 sm:p-8"
                     >
-                        <h2 class="text-lg font-semibold text-gray-900">{{ t('welcome.demo_title') }}</h2>
+                        <h2 class="text-lg font-semibold text-gray-900">
+                            {{ t('welcome.demo_title') }}
+                        </h2>
                         <p class="mt-2 text-sm text-gray-600">
                             password:
-                            <code class="rounded bg-white px-1.5 py-0.5 text-indigo-700">password</code>
+                            <code class="rounded bg-white px-1.5 py-0.5 text-indigo-700"
+                                >password</code
+                            >
                         </p>
                         <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-3">
                             <div class="rounded-lg bg-white p-3 shadow-sm">
-                                <dt class="font-medium text-gray-500">{{ t('user.role.admin') }}</dt>
+                                <dt class="font-medium text-gray-500">
+                                    {{ t('user.role.admin') }}
+                                </dt>
                                 <dd class="mt-1 font-mono text-gray-800">admin@ticketera.test</dd>
                             </div>
                             <div class="rounded-lg bg-white p-3 shadow-sm">
-                                <dt class="font-medium text-gray-500">{{ t('user.role.agente') }}</dt>
+                                <dt class="font-medium text-gray-500">
+                                    {{ t('user.role.agente') }}
+                                </dt>
                                 <dd class="mt-1 font-mono text-gray-800">maria@ticketera.test</dd>
                             </div>
                             <div class="rounded-lg bg-white p-3 shadow-sm">
-                                <dt class="font-medium text-gray-500">{{ t('user.role.cliente') }}</dt>
+                                <dt class="font-medium text-gray-500">
+                                    {{ t('user.role.cliente') }}
+                                </dt>
                                 <dd class="mt-1 font-mono text-gray-800">cliente@ticketera.test</dd>
                             </div>
                         </dl>

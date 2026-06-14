@@ -13,8 +13,7 @@ defineProps({
 
 const { t } = useTrans();
 
-const categoryHref = (slug) =>
-    route('help.index', slug ? { category: slug, q: undefined } : {});
+const categoryHref = (slug) => route('help.index', slug ? { category: slug, q: undefined } : {});
 </script>
 
 <template>
@@ -22,7 +21,9 @@ const categoryHref = (slug) =>
 
     <div class="min-h-screen bg-gray-50">
         <header class="border-b border-gray-200 bg-white">
-            <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+            <div
+                class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6"
+            >
                 <Link :href="route('help.index')" class="flex items-center gap-2">
                     <ApplicationLogo class="h-8 w-8 fill-current text-indigo-600" />
                     <span class="font-semibold text-gray-900">{{ t('help.title') }}</span>
@@ -120,7 +121,10 @@ const categoryHref = (slug) =>
                 </aside>
 
                 <section class="lg:col-span-3">
-                    <div v-if="articles.length === 0" class="rounded-lg bg-white p-8 text-center text-gray-500">
+                    <div
+                        v-if="articles.length === 0"
+                        class="rounded-lg bg-white p-8 text-center text-gray-500"
+                    >
                         {{ t('help.no_results') }}
                     </div>
                     <ul v-else class="divide-y divide-gray-200 rounded-lg bg-white shadow-sm">
@@ -134,8 +138,13 @@ const categoryHref = (slug) =>
                                         <p class="text-xs text-gray-500">
                                             {{ article.category?.name ?? t('kb.no_category') }}
                                         </p>
-                                        <h3 class="font-medium text-gray-900">{{ article.title }}</h3>
-                                        <p v-if="article.summary" class="mt-1 text-sm text-gray-600">
+                                        <h3 class="font-medium text-gray-900">
+                                            {{ article.title }}
+                                        </h3>
+                                        <p
+                                            v-if="article.summary"
+                                            class="mt-1 text-sm text-gray-600"
+                                        >
                                             {{ article.summary }}
                                         </p>
                                     </div>

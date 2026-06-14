@@ -1,14 +1,14 @@
 <?php
 
+use App\Http\Controllers\Client\TicketController as ClientTicketController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\LocaleController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Panel\AgentController;
 use App\Http\Controllers\Panel\CannedResponseController;
 use App\Http\Controllers\Panel\DepartmentController;
-use App\Http\Controllers\Panel\SettingsController;
-use App\Http\Controllers\Client\TicketController as ClientTicketController;
 use App\Http\Controllers\Panel\KnowledgeBaseController;
+use App\Http\Controllers\Panel\SettingsController;
 use App\Http\Controllers\Panel\SystemHealthController;
 use App\Http\Controllers\Panel\TicketController as PanelTicketController;
 use App\Http\Controllers\ProfileController;

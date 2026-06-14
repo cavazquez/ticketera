@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests\Concerns;
 
 use App\Services\TicketAttachmentService;
+use Illuminate\Http\UploadedFile;
 
 trait ValidatesTicketAttachments
 {
@@ -24,11 +25,11 @@ trait ValidatesTicketAttachments
     }
 
     /**
-     * @return array<int, \Illuminate\Http\UploadedFile>
+     * @return array<int, UploadedFile>
      */
     public function validatedAttachments(): array
     {
-        /** @var array<int, \Illuminate\Http\UploadedFile>|null $attachments */
+        /** @var array<int, UploadedFile>|null $attachments */
         $attachments = $this->file('attachments');
 
         return is_array($attachments) ? array_values($attachments) : [];

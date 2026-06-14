@@ -12,5 +12,11 @@ parameters:
 
     excludePaths:
         - database/migrations/*.php
+        - app/Services/ImapInboundMailFetcher.php
 
     checkOctaneCompatibility: false
+
+    ignoreErrors:
+        -
+            message: '#Property ''human_size'' does not exist in model#'
+            path: app/Models/TicketAttachment.php

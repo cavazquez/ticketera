@@ -23,7 +23,7 @@ class SmtpConnectionTester
 
         Mail::raw(
             'Correo de prueba enviado desde Ticketera. Si lo recibiste, la configuración SMTP es correcta.',
-            static function ($message) use ($recipient, $settings): void {
+            static function ($message) use ($recipient): void {
                 $message->to($recipient)
                     ->subject('Ticketera — prueba SMTP');
             },

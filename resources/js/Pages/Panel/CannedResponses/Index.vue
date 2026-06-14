@@ -137,16 +137,24 @@ const destroyCanned = (id) => {
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500"
+                                >
                                     Título
                                 </th>
-                                <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500"
+                                >
                                     Departamento
                                 </th>
-                                <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500"
+                                >
                                     Estado
                                 </th>
-                                <th class="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">
+                                <th
+                                    class="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500"
+                                >
                                     Acciones
                                 </th>
                             </tr>
@@ -199,7 +207,10 @@ const destroyCanned = (id) => {
                                             <PrimaryButton :disabled="editForm.processing">
                                                 Guardar
                                             </PrimaryButton>
-                                            <SecondaryButton type="button" @click="editingId = null">
+                                            <SecondaryButton
+                                                type="button"
+                                                @click="editingId = null"
+                                            >
                                                 Cancelar
                                             </SecondaryButton>
                                         </div>

@@ -10,6 +10,7 @@ use App\Models\Department;
 use App\Models\Setting;
 use App\Services\ImapConnectionTester;
 use App\Services\SmtpConnectionTester;
+use App\Support\LocaleManager;
 use App\Support\TimezoneOptions;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -44,7 +45,7 @@ class SettingsController extends Controller
                 ->values(),
             'keycloakCallbackUrl' => route('auth.keycloak.callback', absolute: true),
             'timezones' => TimezoneOptions::grouped(),
-            'locales' => \App\Support\LocaleManager::labels(),
+            'locales' => LocaleManager::labels(),
         ]);
     }
 
@@ -84,7 +85,7 @@ class SettingsController extends Controller
         }
 
         if (filled($settings->locale)) {
-            \App\Support\LocaleManager::apply($settings->locale);
+            LocaleManager::apply($settings->locale);
         }
 
         return back()->with('success', __('messages.settings_saved'));

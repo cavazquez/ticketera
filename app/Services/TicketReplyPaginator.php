@@ -3,13 +3,15 @@
 namespace App\Services;
 
 use App\Models\Ticket;
+use App\Models\TicketReply;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 class TicketReplyPaginator
 {
-    private const PER_PAGE = 20;
+    private const int PER_PAGE = 20;
 
+    /** @return LengthAwarePaginator<int, TicketReply> */
     public function paginate(Ticket $ticket, Request $request, bool $includeInternal): LengthAwarePaginator
     {
         $query = $ticket->replies()

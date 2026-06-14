@@ -15,16 +15,16 @@ use Illuminate\Support\Facades\Schema;
 
 class SystemHealthService
 {
-    private const PHP_MIN_VERSION = '8.3.0';
+    private const string PHP_MIN_VERSION = '8.3.0';
 
     /** @var list<string> */
-    private const REQUIRED_EXTENSIONS = ['pdo_mysql', 'mbstring', 'openssl', 'tokenizer', 'xml', 'ctype', 'json', 'fileinfo'];
+    private const array REQUIRED_EXTENSIONS = ['pdo_mysql', 'mbstring', 'openssl', 'tokenizer', 'xml', 'ctype', 'json', 'fileinfo'];
 
     /** @var list<string> */
-    private const RECOMMENDED_EXTENSIONS = ['redis', 'imap', 'ldap'];
+    private const array RECOMMENDED_EXTENSIONS = ['redis', 'imap', 'ldap'];
 
     /** @var list<string> */
-    private const REQUIRED_TABLES = [
+    private const array REQUIRED_TABLES = [
         'users',
         'departments',
         'tickets',
@@ -41,7 +41,7 @@ class SystemHealthService
     ];
 
     /** @var array<string, list<string>> */
-    private const RECOMMENDED_INDEXES = [
+    private const array RECOMMENDED_INDEXES = [
         'tickets' => [
             'tickets_queue_index',
             'tickets_assignee_status_index',
@@ -54,7 +54,7 @@ class SystemHealthService
     ];
 
     public function __construct(
-        private Migrator $migrator,
+        private readonly Migrator $migrator,
     ) {}
 
     /**
@@ -194,9 +194,8 @@ class SystemHealthService
         $checks[] = $this->checkDatabaseCharset();
         $checks = [...$checks, ...$this->checkRequiredTables()];
         $checks[] = $this->checkPendingMigrations();
-        $checks = [...$checks, ...$this->checkRecommendedIndexes()];
 
-        return $checks;
+        return [...$checks, ...$this->checkRecommendedIndexes()];
     }
 
     private function checkDatabaseCharset(): HealthCheckResult
@@ -514,7 +513,8 @@ class SystemHealthService
     ): HealthCheckResult {
         $lastBeat = Cache::get($cacheKey);
         $lastBeat = is_numeric($lastBeat) ? (int) $lastBeat : null;
-        $active = $lastBeat !== null && (now()->timestamp - $lastBeat) <= $maxAgeSeconds;
+        $now = (int) now()->timestamp;
+        $active = $lastBeat !== null && ($now - $lastBeat) <= $maxAgeSeconds;
 
         return new HealthCheckResult(
             group: 'operations',

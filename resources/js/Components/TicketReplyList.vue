@@ -18,10 +18,7 @@ const orderedReplies = computed(() => [...props.replies.data].reverse());
 
 <template>
     <div class="space-y-4">
-        <div
-            v-if="replies.next_page_url"
-            class="flex justify-center"
-        >
+        <div v-if="replies.next_page_url" class="flex justify-center">
             <Link
                 :href="replies.next_page_url"
                 preserve-scroll
@@ -31,12 +28,9 @@ const orderedReplies = computed(() => [...props.replies.data].reverse());
             </Link>
         </div>
 
-        <p
-            v-if="replies.total > replies.per_page"
-            class="text-center text-xs text-gray-500"
-        >
-            Página {{ replies.current_page }} de {{ replies.last_page }}
-            ({{ replies.total }} respuestas)
+        <p v-if="replies.total > replies.per_page" class="text-center text-xs text-gray-500">
+            Página {{ replies.current_page }} de {{ replies.last_page }} ({{ replies.total }}
+            respuestas)
         </p>
 
         <div
@@ -70,10 +64,7 @@ const orderedReplies = computed(() => [...props.replies.data].reverse());
             <TicketAttachmentList :attachments="reply.attachments" />
         </div>
 
-        <div
-            v-if="replies.prev_page_url"
-            class="flex justify-center"
-        >
+        <div v-if="replies.prev_page_url" class="flex justify-center">
             <Link
                 :href="replies.prev_page_url"
                 preserve-scroll

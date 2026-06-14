@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Enums\SlaAlertType;
 use App\Models\Ticket;
+use App\Models\User;
 use App\Support\TicketMailSubject;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,7 +28,7 @@ class TicketSlaAlertNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        if (! $notifiable instanceof \App\Models\User) {
+        if (! $notifiable instanceof User) {
             throw new \InvalidArgumentException('Expected notifiable to be a user.');
         }
 
@@ -45,8 +46,10 @@ class TicketSlaAlertNotification extends Notification implements ShouldQueue
 
         return $message
             ->line("Asunto: {$this->ticket->subject}")
-            ->line('Departamento: '.($this->ticket->department?->name ?? '—'))
-            ->line('Vencimiento: '.$this->ticket->due_at?->timezone(config('app.timezone'))->format('d/m/Y H:i'))
+            ->line('Departamento: '.$this->ticket->department->name)
+            ->line('Vencimiento: '.($this->ticket->due_at !== null
+                ? $this->ticket->due_at->timezone(config('app.timezone'))->format('d/m/Y H:i')
+                : '—'))
             ->action('Ver ticket en el panel', route('panel.tickets.show', $this->ticket))
             ->line('Ticketera');
     }

@@ -158,12 +158,21 @@ const destroyArticle = (id) => {
                     <form @submit.prevent="submitCategory" class="mt-4 grid gap-4 md:grid-cols-2">
                         <div>
                             <InputLabel for="cat_name" :value="t('kb.category_name')" />
-                            <TextInput id="cat_name" v-model="categoryForm.name" class="mt-1 block w-full" required />
+                            <TextInput
+                                id="cat_name"
+                                v-model="categoryForm.name"
+                                class="mt-1 block w-full"
+                                required
+                            />
                             <InputError class="mt-2" :message="categoryForm.errors.name" />
                         </div>
                         <div>
                             <InputLabel for="cat_slug" :value="t('kb.category_slug')" />
-                            <TextInput id="cat_slug" v-model="categoryForm.slug" class="mt-1 block w-full" />
+                            <TextInput
+                                id="cat_slug"
+                                v-model="categoryForm.slug"
+                                class="mt-1 block w-full"
+                            />
                             <InputError class="mt-2" :message="categoryForm.errors.slug" />
                         </div>
                         <div class="md:col-span-2">
@@ -176,7 +185,9 @@ const destroyArticle = (id) => {
                             />
                         </div>
                         <div class="flex items-end">
-                            <PrimaryButton :disabled="categoryForm.processing">{{ t('common.create') }}</PrimaryButton>
+                            <PrimaryButton :disabled="categoryForm.processing">{{
+                                t('common.create')
+                            }}</PrimaryButton>
                         </div>
                     </form>
 
@@ -193,28 +204,68 @@ const destroyArticle = (id) => {
                             </thead>
                             <tbody class="divide-y divide-gray-100">
                                 <tr v-for="category in categories" :key="category.id">
-                                    <td colspan="4" v-if="editingCategoryId === category.id" class="bg-indigo-50 p-4">
-                                        <form @submit.prevent="submitCategoryEdit(category.id)" class="grid gap-3 md:grid-cols-2">
+                                    <td
+                                        colspan="4"
+                                        v-if="editingCategoryId === category.id"
+                                        class="bg-indigo-50 p-4"
+                                    >
+                                        <form
+                                            @submit.prevent="submitCategoryEdit(category.id)"
+                                            class="grid gap-3 md:grid-cols-2"
+                                        >
                                             <TextInput v-model="categoryEditForm.name" required />
                                             <TextInput v-model="categoryEditForm.slug" required />
-                                            <textarea v-model="categoryEditForm.description" rows="2" class="md:col-span-2 w-full rounded-md border-gray-300" />
+                                            <textarea
+                                                v-model="categoryEditForm.description"
+                                                rows="2"
+                                                class="md:col-span-2 w-full rounded-md border-gray-300"
+                                            />
                                             <label class="flex items-center gap-2">
-                                                <input v-model="categoryEditForm.is_active" type="checkbox" />
+                                                <input
+                                                    v-model="categoryEditForm.is_active"
+                                                    type="checkbox"
+                                                />
                                                 {{ t('common.active') }}
                                             </label>
                                             <div class="flex gap-2">
-                                                <PrimaryButton type="submit">{{ t('common.save') }}</PrimaryButton>
-                                                <SecondaryButton type="button" @click="editingCategoryId = null">{{ t('common.cancel') }}</SecondaryButton>
+                                                <PrimaryButton type="submit">{{
+                                                    t('common.save')
+                                                }}</PrimaryButton>
+                                                <SecondaryButton
+                                                    type="button"
+                                                    @click="editingCategoryId = null"
+                                                    >{{ t('common.cancel') }}</SecondaryButton
+                                                >
                                             </div>
                                         </form>
                                     </td>
                                     <template v-else>
                                         <td class="px-4 py-2">{{ category.name }}</td>
-                                        <td class="px-4 py-2 font-mono text-xs">{{ category.slug }}</td>
-                                        <td class="px-4 py-2 text-center">{{ category.is_active ? t('common.yes') : t('common.no') }}</td>
+                                        <td class="px-4 py-2 font-mono text-xs">
+                                            {{ category.slug }}
+                                        </td>
+                                        <td class="px-4 py-2 text-center">
+                                            {{
+                                                category.is_active
+                                                    ? t('common.yes')
+                                                    : t('common.no')
+                                            }}
+                                        </td>
                                         <td class="px-4 py-2">
-                                            <button type="button" class="text-indigo-600" @click="startEditCategory(category)">{{ t('common.edit') }}</button>
-                                            <button type="button" class="ms-3 text-red-600" @click="destroyCategory(category.id)">{{ t('common.delete') }}</button>
+                                            <button
+                                                type="button"
+                                                class="text-indigo-600"
+                                                @click="startEditCategory(category)"
+                                            >
+                                                {{ t('common.edit') }}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="ms-3 text-red-600"
+                                                @click="destroyCategory(category.id)"
+                                            >
+                                                {{ t('common.delete') }}
+                                            </button>
                                         </td>
                                     </template>
                                 </tr>
@@ -229,24 +280,50 @@ const destroyArticle = (id) => {
                         <div class="grid gap-4 md:grid-cols-2">
                             <div>
                                 <InputLabel for="art_title" :value="t('kb.article_title')" />
-                                <TextInput id="art_title" v-model="articleForm.title" class="mt-1 block w-full" required />
+                                <TextInput
+                                    id="art_title"
+                                    v-model="articleForm.title"
+                                    class="mt-1 block w-full"
+                                    required
+                                />
                                 <InputError class="mt-2" :message="articleForm.errors.title" />
                             </div>
                             <div>
                                 <InputLabel for="art_cat" :value="t('kb.article_category')" />
-                                <select id="art_cat" v-model="articleForm.kb_category_id" class="mt-1 block w-full rounded-md border-gray-300">
+                                <select
+                                    id="art_cat"
+                                    v-model="articleForm.kb_category_id"
+                                    class="mt-1 block w-full rounded-md border-gray-300"
+                                >
                                     <option value="">{{ t('kb.no_category') }}</option>
-                                    <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+                                    <option
+                                        v-for="category in categories"
+                                        :key="category.id"
+                                        :value="category.id"
+                                    >
+                                        {{ category.name }}
+                                    </option>
                                 </select>
                             </div>
                         </div>
                         <div>
                             <InputLabel for="art_summary" :value="t('kb.article_summary')" />
-                            <textarea id="art_summary" v-model="articleForm.summary" rows="2" class="mt-1 block w-full rounded-md border-gray-300" />
+                            <textarea
+                                id="art_summary"
+                                v-model="articleForm.summary"
+                                rows="2"
+                                class="mt-1 block w-full rounded-md border-gray-300"
+                            />
                         </div>
                         <div>
                             <InputLabel for="art_body" :value="t('kb.article_body')" />
-                            <textarea id="art_body" v-model="articleForm.body" rows="8" class="mt-1 block w-full rounded-md border-gray-300" required />
+                            <textarea
+                                id="art_body"
+                                v-model="articleForm.body"
+                                rows="8"
+                                class="mt-1 block w-full rounded-md border-gray-300"
+                                required
+                            />
                             <InputError class="mt-2" :message="articleForm.errors.body" />
                         </div>
                         <div class="flex flex-wrap gap-4">
@@ -258,40 +335,106 @@ const destroyArticle = (id) => {
                                 <input v-model="articleForm.is_featured" type="checkbox" />
                                 {{ t('common.featured') }}
                             </label>
-                            <PrimaryButton :disabled="articleForm.processing">{{ t('common.create') }}</PrimaryButton>
+                            <PrimaryButton :disabled="articleForm.processing">{{
+                                t('common.create')
+                            }}</PrimaryButton>
                         </div>
                     </form>
 
                     <h4 class="mb-3 mt-8 font-medium text-gray-900">{{ t('kb.articles') }}</h4>
                     <ul class="divide-y divide-gray-100">
                         <li v-for="article in articles" :key="article.id" class="py-4">
-                            <div v-if="editingArticleId === article.id" class="space-y-3 rounded-lg bg-indigo-50 p-4">
-                                <form @submit.prevent="submitArticleEdit(article.id)" class="space-y-3">
+                            <div
+                                v-if="editingArticleId === article.id"
+                                class="space-y-3 rounded-lg bg-indigo-50 p-4"
+                            >
+                                <form
+                                    @submit.prevent="submitArticleEdit(article.id)"
+                                    class="space-y-3"
+                                >
                                     <TextInput v-model="articleEditForm.title" required />
-                                    <select v-model="articleEditForm.kb_category_id" class="w-full rounded-md border-gray-300">
+                                    <select
+                                        v-model="articleEditForm.kb_category_id"
+                                        class="w-full rounded-md border-gray-300"
+                                    >
                                         <option value="">{{ t('kb.no_category') }}</option>
-                                        <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+                                        <option
+                                            v-for="category in categories"
+                                            :key="category.id"
+                                            :value="category.id"
+                                        >
+                                            {{ category.name }}
+                                        </option>
                                     </select>
-                                    <textarea v-model="articleEditForm.summary" rows="2" class="w-full rounded-md border-gray-300" />
-                                    <textarea v-model="articleEditForm.body" rows="6" class="w-full rounded-md border-gray-300" required />
+                                    <textarea
+                                        v-model="articleEditForm.summary"
+                                        rows="2"
+                                        class="w-full rounded-md border-gray-300"
+                                    />
+                                    <textarea
+                                        v-model="articleEditForm.body"
+                                        rows="6"
+                                        class="w-full rounded-md border-gray-300"
+                                        required
+                                    />
                                     <div class="flex flex-wrap gap-4">
-                                        <label class="flex items-center gap-2 text-sm"><input v-model="articleEditForm.is_published" type="checkbox" />{{ t('common.published') }}</label>
-                                        <label class="flex items-center gap-2 text-sm"><input v-model="articleEditForm.is_featured" type="checkbox" />{{ t('common.featured') }}</label>
+                                        <label class="flex items-center gap-2 text-sm"
+                                            ><input
+                                                v-model="articleEditForm.is_published"
+                                                type="checkbox"
+                                            />{{ t('common.published') }}</label
+                                        >
+                                        <label class="flex items-center gap-2 text-sm"
+                                            ><input
+                                                v-model="articleEditForm.is_featured"
+                                                type="checkbox"
+                                            />{{ t('common.featured') }}</label
+                                        >
                                     </div>
                                     <div class="flex gap-2">
-                                        <PrimaryButton type="submit">{{ t('common.save') }}</PrimaryButton>
-                                        <SecondaryButton type="button" @click="editingArticleId = null">{{ t('common.cancel') }}</SecondaryButton>
+                                        <PrimaryButton type="submit">{{
+                                            t('common.save')
+                                        }}</PrimaryButton>
+                                        <SecondaryButton
+                                            type="button"
+                                            @click="editingArticleId = null"
+                                            >{{ t('common.cancel') }}</SecondaryButton
+                                        >
                                     </div>
                                 </form>
                             </div>
                             <div v-else class="flex flex-wrap items-start justify-between gap-4">
                                 <div>
-                                    <a :href="route('help.show', article.slug)" target="_blank" class="font-medium text-gray-900 hover:text-indigo-600">{{ article.title }}</a>
-                                    <p class="text-sm text-gray-500">{{ article.category?.name ?? t('kb.no_category') }} · {{ article.is_published ? t('common.published') : t('common.draft') }}</p>
+                                    <a
+                                        :href="route('help.show', article.slug)"
+                                        target="_blank"
+                                        class="font-medium text-gray-900 hover:text-indigo-600"
+                                        >{{ article.title }}</a
+                                    >
+                                    <p class="text-sm text-gray-500">
+                                        {{ article.category?.name ?? t('kb.no_category') }} ·
+                                        {{
+                                            article.is_published
+                                                ? t('common.published')
+                                                : t('common.draft')
+                                        }}
+                                    </p>
                                 </div>
                                 <div class="flex gap-3 text-sm">
-                                    <button type="button" class="text-indigo-600" @click="startEditArticle(article)">{{ t('common.edit') }}</button>
-                                    <button type="button" class="text-red-600" @click="destroyArticle(article.id)">{{ t('common.delete') }}</button>
+                                    <button
+                                        type="button"
+                                        class="text-indigo-600"
+                                        @click="startEditArticle(article)"
+                                    >
+                                        {{ t('common.edit') }}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="text-red-600"
+                                        @click="destroyArticle(article.id)"
+                                    >
+                                        {{ t('common.delete') }}
+                                    </button>
                                 </div>
                             </div>
                         </li>

@@ -115,7 +115,7 @@ class TicketController extends Controller
             ->get()
             ->map(fn ($activity) => [
                 'id' => $activity->id,
-                'user_name' => $activity->user?->name ?? 'Sistema',
+                'user_name' => $activity->user_id !== null ? ($activity->user->name ?? 'Sistema') : 'Sistema',
                 'field_label' => $activity->fieldLabel(),
                 'change' => $activity->formattedChange(),
                 'created_at' => $activity->created_at,

@@ -16,7 +16,7 @@ abstract class Controller
 
     protected function requireUser(?Request $request = null): User
     {
-        if ($request !== null) {
+        if ($request instanceof Request) {
             return AuthenticatedUser::from($request->user());
         }
 

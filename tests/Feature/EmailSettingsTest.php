@@ -3,15 +3,15 @@
 namespace Tests\Feature;
 
 use App\Enums\UserRole;
+use App\Models\Department;
 use App\Models\Setting;
+use App\Models\Ticket;
 use App\Models\User;
 use App\Services\ImapConnectionTester;
 use App\Services\MailConfigurator;
 use App\Services\SmtpConnectionTester;
 use App\Support\TicketMailSubject;
 use App\Support\TicketReplyToken;
-use App\Models\Department;
-use App\Models\Ticket;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

@@ -70,6 +70,8 @@ class TicketActivity extends Model
             return 'Sin asignar';
         }
 
-        return User::query()->find($userId)?->name ?? "Usuario #{$userId}";
+        $user = User::query()->find($userId);
+
+        return $user instanceof User ? $user->name : "Usuario #{$userId}";
     }
 }

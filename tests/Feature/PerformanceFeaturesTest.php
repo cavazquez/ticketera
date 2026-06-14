@@ -36,8 +36,8 @@ class PerformanceFeaturesTest extends TestCase
 
         $this->assertNotSame($first->number, $second->number);
         $this->assertSame(
-            (int) substr($first->number, 4) + 1,
-            (int) substr($second->number, 4),
+            (int) substr((string) $first->number, 4) + 1,
+            (int) substr((string) $second->number, 4),
         );
     }
 

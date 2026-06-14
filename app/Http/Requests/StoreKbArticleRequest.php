@@ -32,6 +32,7 @@ class StoreKbArticleRequest extends FormRequest
         ];
     }
 
+    #[\Override]
     protected function prepareForValidation(): void
     {
         if (blank($this->input('slug')) && filled($this->input('title'))) {

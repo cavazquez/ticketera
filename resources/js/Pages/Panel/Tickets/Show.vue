@@ -10,12 +10,7 @@ import TicketActivityLog from '@/Components/TicketActivityLog.vue';
 import TicketAttachmentInput from '@/Components/TicketAttachmentInput.vue';
 import TicketAttachmentList from '@/Components/TicketAttachmentList.vue';
 import TicketReplyList from '@/Components/TicketReplyList.vue';
-import {
-    priorityColor,
-    priorityLabels,
-    statusColor,
-    statusLabels,
-} from '@/utils/ticketLabels';
+import { priorityColor, priorityLabels, statusColor, statusLabels } from '@/utils/ticketLabels';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -118,7 +113,10 @@ const applyCannedResponse = (event) => {
                         <div class="rounded-lg bg-white p-6 shadow-sm">
                             <form @submit.prevent="submitReply" class="space-y-4">
                                 <div v-if="cannedResponses.length">
-                                    <InputLabel for="canned_response" value="Respuesta predefinida" />
+                                    <InputLabel
+                                        for="canned_response"
+                                        value="Respuesta predefinida"
+                                    />
                                     <select
                                         id="canned_response"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"

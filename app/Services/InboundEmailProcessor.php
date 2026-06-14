@@ -12,6 +12,7 @@ use App\Models\Department;
 use App\Models\ProcessedIncomingEmail;
 use App\Models\Setting;
 use App\Models\Ticket;
+use App\Models\TicketReply;
 use App\Models\User;
 use App\Policies\TicketPolicy;
 use Illuminate\Support\Facades\DB;
@@ -20,11 +21,11 @@ use Illuminate\Support\Str;
 class InboundEmailProcessor
 {
     public function __construct(
-        private InboundEmailParser $parser,
-        private TicketSetupService $ticketSetup,
-        private TicketAttachmentService $attachments,
-        private TicketNotifier $notifier,
-        private TicketPolicy $ticketPolicy,
+        private readonly InboundEmailParser $parser,
+        private readonly TicketSetupService $ticketSetup,
+        private readonly TicketAttachmentService $attachments,
+        private readonly TicketNotifier $notifier,
+        private readonly TicketPolicy $ticketPolicy,
     ) {}
 
     public function process(IncomingEmailMessage $message): ?Ticket
@@ -65,7 +66,7 @@ class InboundEmailProcessor
         }
 
         $user = $this->resolveUser($message);
-        if ($user === null || ! $this->ticketPolicy->reply($user, $ticket)) {
+        if (! $user instanceof User || ! $this->ticketPolicy->reply($user, $ticket)) {
             return null;
         }
 
@@ -90,7 +91,7 @@ class InboundEmailProcessor
         }
 
         $user = $this->resolveUser($message);
-        if ($user === null) {
+        if (! $user instanceof User) {
             return null;
         }
 
@@ -144,7 +145,7 @@ class InboundEmailProcessor
         Ticket $ticket,
         User $user,
         array $attachments,
-        ?\App\Models\TicketReply $reply = null,
+        ?TicketReply $reply = null,
     ): void {
         foreach ($attachments as $attachment) {
             $this->attachments->storeFromContents(
@@ -178,10 +179,6 @@ class InboundEmailProcessor
             return true;
         }
 
-        if ($settings->support_email && $email === Str::lower($settings->support_email)) {
-            return true;
-        }
-
-        return false;
+        return $settings->support_email && $email === Str::lower($settings->support_email);
     }
 }

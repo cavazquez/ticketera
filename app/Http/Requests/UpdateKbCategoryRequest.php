@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Models\KbCategory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -20,7 +21,8 @@ class UpdateKbCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
-        $categoryId = $this->route('kbCategory')?->id;
+        $categoryId = $this->route('kbCategory');
+        $categoryId = $categoryId instanceof KbCategory ? $categoryId->id : null;
 
         return [
             'name' => ['required', 'string', 'max:120'],
@@ -37,6 +39,7 @@ class UpdateKbCategoryRequest extends FormRequest
         ];
     }
 
+    #[\Override]
     protected function prepareForValidation(): void
     {
         if (blank($this->input('slug')) && filled($this->input('name'))) {

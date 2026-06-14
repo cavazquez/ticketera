@@ -36,11 +36,13 @@ class KbArticle extends Model
         ];
     }
 
+    /** @return BelongsTo<KbCategory, $this> */
     public function category(): BelongsTo
     {
         return $this->belongsTo(KbCategory::class, 'kb_category_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

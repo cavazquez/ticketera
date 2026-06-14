@@ -9,7 +9,7 @@ use App\Models\Setting;
 class ImapConnectionTester
 {
     public function __construct(
-        private ImapInboundMailFetcher $fetcher,
+        private readonly ImapInboundMailFetcher $fetcher,
     ) {}
 
     public function test(?Setting $settings = null): void

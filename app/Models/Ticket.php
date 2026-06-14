@@ -8,8 +8,11 @@ use App\Services\TicketNumberGenerator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
+ * @property Carbon|null $due_at
+ * @property-read Department $department
  * @property TicketStatus $status
  * @property TicketPriority $priority
  * @property-read User $user

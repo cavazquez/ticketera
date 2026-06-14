@@ -14,6 +14,7 @@ class LocaleManager
     /** @var list<string> */
     public const SUPPORTED = ['es', 'en'];
 
+    /** @return array<string, string> */
     public static function labels(): array
     {
         return [
@@ -26,7 +27,7 @@ class LocaleManager
     {
         $candidate = null;
 
-        if ($request !== null && $request->hasSession()) {
+        if ($request instanceof Request && $request->hasSession()) {
             $candidate = $request->session()->get('locale');
         }
 
@@ -36,7 +37,7 @@ class LocaleManager
 
         try {
             $settingsLocale = Setting::current()->locale;
-            if (is_string($settingsLocale) && self::isSupported($settingsLocale)) {
+            if (self::isSupported($settingsLocale)) {
                 return $settingsLocale;
             }
         } catch (\Throwable) {
@@ -50,7 +51,7 @@ class LocaleManager
 
     public static function apply(?string $locale = null, ?Request $request = null): string
     {
-        $locale = $locale ?? self::resolve($request);
+        $locale ??= self::resolve($request);
         App::setLocale($locale);
         config(['app.locale' => $locale]);
 
@@ -67,7 +68,7 @@ class LocaleManager
      */
     public static function uiTranslations(?string $locale = null): array
     {
-        $locale = $locale ?? App::getLocale();
+        $locale ??= App::getLocale();
         $path = lang_path("{$locale}.json");
 
         if (! File::exists($path)) {

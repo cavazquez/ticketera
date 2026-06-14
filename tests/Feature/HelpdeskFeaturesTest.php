@@ -12,6 +12,7 @@ use App\Models\Setting;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Notifications\TicketSlaAlertNotification;
+use App\Services\TicketSetupService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;
@@ -212,7 +213,7 @@ class HelpdeskFeaturesTest extends TestCase
             'sla_breach_sent_at' => now(),
         ]);
 
-        app(\App\Services\TicketSetupService::class)->applySla($ticket);
+        app(TicketSetupService::class)->applySla($ticket);
 
         $ticket->refresh();
         $this->assertNull($ticket->sla_warning_sent_at);

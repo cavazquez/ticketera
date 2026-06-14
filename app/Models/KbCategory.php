@@ -26,11 +26,13 @@ class KbCategory extends Model
         ];
     }
 
+    /** @return HasMany<KbArticle, $this> */
     public function articles(): HasMany
     {
         return $this->hasMany(KbArticle::class);
     }
 
+    /** @return HasMany<KbArticle, $this> */
     public function publishedArticles(): HasMany
     {
         return $this->articles()

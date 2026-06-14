@@ -11,6 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class StoreTicketReplyRequest extends FormRequest
 {
     use ValidatesTicketAttachments;
+
     public function authorize(): bool
     {
         return true;

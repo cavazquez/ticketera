@@ -65,10 +65,7 @@ const summaryBannerClass = computed(() => {
 
         <div class="py-12">
             <div class="mx-auto max-w-5xl space-y-6 sm:px-6 lg:px-8">
-                <section
-                    class="rounded-lg border p-5 shadow-sm"
-                    :class="summaryBannerClass"
-                >
+                <section class="rounded-lg border p-5 shadow-sm" :class="summaryBannerClass">
                     <div class="flex flex-wrap items-start justify-between gap-4">
                         <div>
                             <p class="text-lg font-semibold">
