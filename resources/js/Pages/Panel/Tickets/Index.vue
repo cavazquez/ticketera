@@ -5,9 +5,15 @@ import FlashMessage from '@/Components/FlashMessage.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import AgentCombobox from '@/Components/AgentCombobox.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { priorityColor, priorityLabels, statusColor, statusLabels } from '@/utils/ticketLabels';
+import { priorityColor, statusColor, useTicketLabels } from '@/utils/ticketLabels';
+import { useTrans } from '@/composables/useTrans';
+import { useFormat } from '@/composables/useFormat';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { computed, reactive, watch } from 'vue';
+
+const { t } = useTrans();
+const { formatDateTime } = useFormat();
+const { statusLabels, priorityLabels } = useTicketLabels();
 
 const props = defineProps({
     tickets: Object,
@@ -66,11 +72,13 @@ watch(
 </script>
 
 <template>
-    <Head title="Cola de tickets" />
+    <Head :title="t('nav.ticket_queue')" />
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Cola de tickets</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                {{ t('nav.ticket_queue') }}
+            </h2>
         </template>
 
         <div class="py-12">
@@ -81,13 +89,13 @@ watch(
                     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                         <TextInput
                             v-model="localFilters.search"
-                            placeholder="Buscar por número o asunto..."
+                            :placeholder="t('panel.tickets.search_placeholder')"
                         />
                         <select
                             v-model="localFilters.status"
                             class="rounded-md border-gray-300 shadow-sm"
                         >
-                            <option value="">Todos los estados</option>
+                            <option value="">{{ t('panel.tickets.all_statuses') }}</option>
                             <option
                                 v-for="status in statuses"
                                 :key="status.value"
@@ -100,7 +108,7 @@ watch(
                             v-model="localFilters.department_id"
                             class="rounded-md border-gray-300 shadow-sm"
                         >
-                            <option value="">Todos los departamentos</option>
+                            <option value="">{{ t('panel.tickets.all_departments') }}</option>
                             <option
                                 v-for="department in departments"
                                 :key="department.id"
@@ -113,7 +121,7 @@ watch(
                             v-model="localFilters.priority"
                             class="rounded-md border-gray-300 shadow-sm"
                         >
-                            <option value="">Todas las prioridades</option>
+                            <option value="">{{ t('panel.tickets.all_priorities') }}</option>
                             <option
                                 v-for="priority in priorities"
                                 :key="priority.value"
@@ -132,7 +140,7 @@ watch(
                                 type="button"
                                 @click="clearFilters"
                             >
-                                Limpiar filtros
+                                {{ t('panel.tickets.clear_filters') }}
                             </SecondaryButton>
                         </div>
                     </div>
@@ -140,7 +148,7 @@ watch(
 
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div v-if="tickets.data.length === 0" class="p-6 text-gray-500">
-                        No hay tickets con los filtros seleccionados.
+                        {{ t('panel.tickets.none_with_filters') }}
                     </div>
 
                     <div v-else class="divide-y divide-gray-200">
@@ -157,12 +165,13 @@ watch(
                                         {{ ticket.subject }}
                                     </h3>
                                     <p class="mt-1 text-sm text-gray-500">
-                                        Cliente: {{ ticket.user?.name }} ·
+                                        {{ t('panel.tickets.client') }}: {{ ticket.user?.name }} ·
                                         {{ ticket.department?.name }}
                                         <span v-if="ticket.assignee">
-                                            · Asignado: {{ ticket.assignee.name }}</span
+                                            · {{ t('panel.tickets.assigned') }}:
+                                            {{ ticket.assignee.name }}</span
                                         >
-                                        <span v-else> · Sin asignar</span>
+                                        <span v-else> · {{ t('common.unassigned') }}</span>
                                         <span
                                             v-if="ticket.due_at"
                                             :class="
@@ -171,8 +180,8 @@ watch(
                                                     : ''
                                             "
                                         >
-                                            · SLA:
-                                            {{ new Date(ticket.due_at).toLocaleString('es-AR') }}
+                                            · {{ t('panel.tickets.sla') }}:
+                                            {{ formatDateTime(ticket.due_at) }}
                                         </span>
                                     </p>
                                 </div>

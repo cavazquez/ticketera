@@ -1,6 +1,7 @@
 <script setup>
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
+import { useTrans } from '@/composables/useTrans';
 
 defineProps({
     error: String,
@@ -9,6 +10,8 @@ defineProps({
         default: 5,
     },
 });
+
+const { t } = useTrans();
 
 const model = defineModel({
     type: Array,
@@ -22,7 +25,7 @@ const onFilesSelected = (event) => {
 
 <template>
     <div>
-        <InputLabel for="attachments" value="Adjuntos (opcional)" />
+        <InputLabel for="attachments" :value="t('attachments.label')" />
         <input
             id="attachments"
             type="file"
@@ -31,7 +34,7 @@ const onFilesSelected = (event) => {
             @change="onFilesSelected"
         />
         <p class="mt-1 text-xs text-gray-500">
-            Hasta {{ maxFiles }} archivos, 20 MB c/u. PDF, imágenes, Office, TXT, CSV, ZIP.
+            {{ t('attachments.hint', { max: maxFiles }) }}
         </p>
         <InputError class="mt-2" :message="error" />
     </div>

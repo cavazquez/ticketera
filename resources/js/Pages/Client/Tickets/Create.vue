@@ -7,6 +7,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TicketAttachmentInput from '@/Components/TicketAttachmentInput.vue';
 import TurnstileWidget from '@/Components/TurnstileWidget.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { useTrans } from '@/composables/useTrans';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 
 defineProps({
@@ -14,6 +15,7 @@ defineProps({
     priorities: Array,
 });
 
+const { t } = useTrans();
 const page = usePage();
 const turnstile = page.props.turnstile;
 
@@ -35,11 +37,13 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Nuevo ticket" />
+    <Head :title="t('client.tickets.new')" />
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Nuevo ticket</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                {{ t('client.tickets.new') }}
+            </h2>
         </template>
 
         <div class="py-12">
@@ -52,7 +56,7 @@ const submit = () => {
                             class="absolute -left-[9999px] h-0 w-0 overflow-hidden"
                             aria-hidden="true"
                         >
-                            <label for="company_website">No completar</label>
+                            <label for="company_website">{{ t('common.do_not_fill') }}</label>
                             <input
                                 id="company_website"
                                 v-model="form.company_website"
@@ -64,7 +68,7 @@ const submit = () => {
                         </div>
 
                         <div>
-                            <InputLabel for="subject" value="Asunto" />
+                            <InputLabel for="subject" :value="t('client.tickets.subject')" />
                             <TextInput
                                 id="subject"
                                 v-model="form.subject"
@@ -75,14 +79,17 @@ const submit = () => {
                         </div>
 
                         <div>
-                            <InputLabel for="department_id" value="Departamento" />
+                            <InputLabel
+                                for="department_id"
+                                :value="t('client.tickets.department')"
+                            />
                             <select
                                 id="department_id"
                                 v-model="form.department_id"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 required
                             >
-                                <option value="">Seleccionar...</option>
+                                <option value="">{{ t('common.select') }}</option>
                                 <option
                                     v-for="department in departments"
                                     :key="department.id"
@@ -95,7 +102,7 @@ const submit = () => {
                         </div>
 
                         <div>
-                            <InputLabel for="priority" value="Prioridad" />
+                            <InputLabel for="priority" :value="t('client.tickets.priority')" />
                             <select
                                 id="priority"
                                 v-model="form.priority"
@@ -113,7 +120,7 @@ const submit = () => {
                         </div>
 
                         <div>
-                            <InputLabel for="body" value="Mensaje" />
+                            <InputLabel for="body" :value="t('client.tickets.message')" />
                             <textarea
                                 id="body"
                                 v-model="form.body"
@@ -139,13 +146,13 @@ const submit = () => {
 
                         <div class="flex items-center gap-4">
                             <PrimaryButton :disabled="form.processing">
-                                Enviar ticket
+                                {{ t('client.tickets.submit') }}
                             </PrimaryButton>
                             <Link
                                 :href="route('client.tickets.index')"
                                 class="text-sm text-gray-600 hover:text-gray-900"
                             >
-                                Cancelar
+                                {{ t('common.cancel') }}
                             </Link>
                         </div>
                     </form>

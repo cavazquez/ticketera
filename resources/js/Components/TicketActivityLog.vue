@@ -1,18 +1,24 @@
 <script setup>
+import { useTrans } from '@/composables/useTrans';
+import { useFormat } from '@/composables/useFormat';
+
 defineProps({
     activities: {
         type: Array,
         default: () => [],
     },
 });
+
+const { t } = useTrans();
+const { formatDateTime } = useFormat();
 </script>
 
 <template>
     <div class="rounded-lg bg-white p-6 shadow-sm">
-        <h3 class="mb-4 font-semibold text-gray-900">Historial de cambios</h3>
+        <h3 class="mb-4 font-semibold text-gray-900">{{ t('activity.title') }}</h3>
 
         <p v-if="!activities.length" class="text-sm text-gray-500">
-            Todavía no hay cambios registrados.
+            {{ t('activity.empty') }}
         </p>
 
         <ul v-else class="space-y-3">
@@ -27,7 +33,7 @@ defineProps({
                 <p class="text-sm text-gray-600">{{ activity.change }}</p>
                 <p class="mt-1 text-xs text-gray-500">
                     {{ activity.user_name }} ·
-                    {{ new Date(activity.created_at).toLocaleString('es-AR') }}
+                    {{ formatDateTime(activity.created_at) }}
                 </p>
             </li>
         </ul>

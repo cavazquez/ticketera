@@ -8,13 +8,19 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TicketAttachmentInput from '@/Components/TicketAttachmentInput.vue';
 import TicketAttachmentList from '@/Components/TicketAttachmentList.vue';
 import TicketReplyList from '@/Components/TicketReplyList.vue';
-import { priorityColor, priorityLabels, statusColor, statusLabels } from '@/utils/ticketLabels';
+import { priorityColor, statusColor, useTicketLabels } from '@/utils/ticketLabels';
+import { useTrans } from '@/composables/useTrans';
+import { useFormat } from '@/composables/useFormat';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 const props = defineProps({
     ticket: Object,
     replies: Object,
 });
+
+const { t } = useTrans();
+const { formatDateTime } = useFormat();
+const { statusLabels, priorityLabels } = useTicketLabels();
 
 const form = useForm({
     body: '',
@@ -39,7 +45,7 @@ const submit = () => {
                     :href="route('client.tickets.index')"
                     class="text-sm text-indigo-600 hover:text-indigo-800"
                 >
-                    ← Volver a mis tickets
+                    ← {{ t('client.tickets.back') }}
                 </Link>
                 <h2 class="mt-2 text-xl font-semibold leading-tight text-gray-800">
                     {{ ticket.number }} · {{ ticket.subject }}
@@ -62,16 +68,18 @@ const submit = () => {
                     />
                     <span class="text-sm text-gray-500">{{ ticket.department?.name }}</span>
                     <span v-if="ticket.assignee" class="text-sm text-gray-500">
-                        · Agente: {{ ticket.assignee.name }}
+                        · {{ t('client.tickets.agent') }}: {{ ticket.assignee.name }}
                     </span>
                 </div>
 
                 <div class="space-y-4">
                     <div class="rounded-lg bg-white p-6 shadow-sm">
                         <div class="mb-2 flex items-center justify-between">
-                            <p class="font-medium text-gray-900">Mensaje inicial</p>
+                            <p class="font-medium text-gray-900">
+                                {{ t('client.tickets.initial_message') }}
+                            </p>
                             <p class="text-xs text-gray-500">
-                                {{ new Date(ticket.created_at).toLocaleString('es-AR') }}
+                                {{ formatDateTime(ticket.created_at) }}
                             </p>
                         </div>
                         <p class="whitespace-pre-wrap text-gray-700">{{ ticket.body }}</p>
@@ -84,7 +92,7 @@ const submit = () => {
                 <div class="mt-8 overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
                     <form @submit.prevent="submit" class="space-y-4">
                         <div>
-                            <InputLabel for="body" value="Tu respuesta" />
+                            <InputLabel for="body" :value="t('client.tickets.your_reply')" />
                             <textarea
                                 id="body"
                                 v-model="form.body"
@@ -98,7 +106,9 @@ const submit = () => {
                             v-model="form.attachments"
                             :error="form.errors.attachments || form.errors['attachments.0']"
                         />
-                        <PrimaryButton :disabled="form.processing">Enviar respuesta</PrimaryButton>
+                        <PrimaryButton :disabled="form.processing">
+                            {{ t('client.tickets.send_reply') }}
+                        </PrimaryButton>
                     </form>
                 </div>
             </div>

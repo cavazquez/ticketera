@@ -1,7 +1,9 @@
 <script setup>
 import Badge from '@/Components/Badge.vue';
 import TicketAttachmentList from '@/Components/TicketAttachmentList.vue';
-import { roleLabels } from '@/utils/ticketLabels';
+import { useTicketLabels } from '@/utils/ticketLabels';
+import { useTrans } from '@/composables/useTrans';
+import { useFormat } from '@/composables/useFormat';
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -12,6 +14,10 @@ const props = defineProps({
         default: false,
     },
 });
+
+const { t } = useTrans();
+const { formatDateTime } = useFormat();
+const { roleLabels } = useTicketLabels();
 
 const orderedReplies = computed(() => [...props.replies.data].reverse());
 </script>
@@ -24,13 +30,18 @@ const orderedReplies = computed(() => [...props.replies.data].reverse());
                 preserve-scroll
                 class="text-sm text-indigo-600 hover:text-indigo-800"
             >
-                ← Mensajes anteriores
+                ← {{ t('reply.older') }}
             </Link>
         </div>
 
         <p v-if="replies.total > replies.per_page" class="text-center text-xs text-gray-500">
-            Página {{ replies.current_page }} de {{ replies.last_page }} ({{ replies.total }}
-            respuestas)
+            {{
+                t('reply.pagination', {
+                    current: replies.current_page,
+                    last: replies.last_page,
+                    total: replies.total,
+                })
+            }}
         </p>
 
         <div
@@ -51,13 +62,13 @@ const orderedReplies = computed(() => [...props.replies.data].reverse());
                     </span>
                     <Badge
                         v-if="showInternal && reply.is_internal"
-                        label="Nota interna"
+                        :label="t('common.internal_note')"
                         color="yellow"
                         class="ml-2"
                     />
                 </p>
                 <p class="text-xs text-gray-500">
-                    {{ new Date(reply.created_at).toLocaleString('es-AR') }}
+                    {{ formatDateTime(reply.created_at) }}
                 </p>
             </div>
             <p class="whitespace-pre-wrap text-gray-700">{{ reply.body }}</p>
@@ -70,7 +81,7 @@ const orderedReplies = computed(() => [...props.replies.data].reverse());
                 preserve-scroll
                 class="text-sm text-indigo-600 hover:text-indigo-800"
             >
-                Mensajes más recientes →
+                {{ t('reply.newer') }} →
             </Link>
         </div>
     </div>
