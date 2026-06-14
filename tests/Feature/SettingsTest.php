@@ -82,6 +82,17 @@ class SettingsTest extends TestCase
         $this->assertSame('America/Argentina/Buenos_Aires', config('app.timezone'));
     }
 
+    public function test_sso_default_role_cannot_be_admin(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+        $this->actingAs($admin)
+            ->patch(route('panel.settings.update'), $this->settingsPayload([
+                'sso_default_role' => 'admin',
+            ]))
+            ->assertSessionHasErrors('sso_default_role');
+    }
+
     public function test_admin_can_configure_keycloak_settings(): void
     {
         $admin = User::factory()->create(['role' => UserRole::Admin]);

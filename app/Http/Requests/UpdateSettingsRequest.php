@@ -37,7 +37,7 @@ class UpdateSettingsRequest extends FormRequest
             'auth_driver' => ['required', Rule::enum(AuthDriver::class)],
             'allow_local_login' => ['required', 'boolean'],
             'sso_auto_provision' => ['required', 'boolean'],
-            'sso_default_role' => ['required', Rule::enum(UserRole::class)],
+            'sso_default_role' => ['required', Rule::in([UserRole::Client->value, UserRole::Agent->value])],
             'ldap_host' => ['nullable', 'string', 'max:255'],
             'ldap_port' => ['nullable', 'integer', 'min:1', 'max:65535'],
             'ldap_base_dn' => ['nullable', 'string', 'max:255'],

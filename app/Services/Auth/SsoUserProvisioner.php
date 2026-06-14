@@ -18,43 +18,91 @@ class SsoUserProvisioner
         AuthProvider $provider,
         ?string $externalId = null,
     ): User {
-        $existing = User::query()
-            ->where(function ($query) use ($email, $externalId) {
-                $query->where('email', $email);
+        $byExternalId = $this->findByExternalId($provider, $externalId);
 
-                if ($externalId) {
-                    $query->orWhere('external_id', $externalId);
-                }
-            })
-            ->first();
-
-        if ($existing) {
-            $existing->update([
+        if ($byExternalId instanceof User) {
+            $byExternalId->update([
                 'name' => $name,
-                'auth_provider' => $provider->value,
-                'external_id' => $externalId ?? $existing->external_id,
-                'email_verified_at' => $existing->email_verified_at ?? now(),
+                'email' => $email,
+                'email_verified_at' => $byExternalId->email_verified_at ?? now(),
             ]);
 
-            return $existing;
+            return $byExternalId;
         }
 
+        $byEmail = User::query()->where('email', $email)->first();
+
+        if ($byEmail instanceof User) {
+            return $this->linkExistingUser($byEmail, $name, $provider, $externalId);
+        }
+
+        return $this->createUser($email, $name, $provider, $externalId);
+    }
+
+    private function findByExternalId(AuthProvider $provider, ?string $externalId): ?User
+    {
+        if ($externalId === null || $externalId === '') {
+            return null;
+        }
+
+        return User::query()
+            ->where('auth_provider', $provider->value)
+            ->where('external_id', $externalId)
+            ->first();
+    }
+
+    private function linkExistingUser(
+        User $user,
+        string $name,
+        AuthProvider $provider,
+        ?string $externalId,
+    ): User {
+        // Never silently take over a local password account just because the IdP
+        // asserts a matching email. Linking must be done deliberately by an admin.
+        if ($user->auth_provider === AuthProvider::Local) {
+            throw ValidationException::withMessages([
+                'email' => 'Ya existe una cuenta local con este correo. Pedile a un administrador que habilite el acceso por SSO.',
+            ]);
+        }
+
+        $user->update([
+            'name' => $name,
+            'auth_provider' => $provider->value,
+            'external_id' => $externalId ?? $user->external_id,
+            'email_verified_at' => $user->email_verified_at ?? now(),
+        ]);
+
+        return $user;
+    }
+
+    private function createUser(
+        string $email,
+        string $name,
+        AuthProvider $provider,
+        ?string $externalId,
+    ): User {
         if (! Setting::current()->sso_auto_provision) {
             throw ValidationException::withMessages([
                 'email' => 'Tu cuenta no está autorizada para acceder al sistema.',
             ]);
         }
 
-        $defaultRole = UserRole::tryFrom(Setting::current()->sso_default_role) ?? UserRole::Client;
-
         return User::create([
             'name' => $name,
             'email' => $email,
             'password' => Hash::make(Str::random(64)),
-            'role' => $defaultRole,
+            'role' => $this->defaultRole(),
             'auth_provider' => $provider->value,
             'external_id' => $externalId,
             'email_verified_at' => now(),
         ]);
+    }
+
+    private function defaultRole(): UserRole
+    {
+        $role = UserRole::tryFrom(Setting::current()->sso_default_role) ?? UserRole::Client;
+
+        // Administrators must never be created automatically through SSO.
+        return $role === UserRole::Admin ? UserRole::Client : $role;
     }
 }

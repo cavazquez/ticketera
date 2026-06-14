@@ -14,6 +14,7 @@ const props = defineProps({
     settings: Object,
     authDrivers: Array,
     userRoles: Array,
+    ssoRoles: Array,
     departments: Array,
     keycloakCallbackUrl: String,
     timezones: Array,
@@ -695,7 +696,7 @@ const submit = () => {
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 >
                                     <option
-                                        v-for="role in userRoles"
+                                        v-for="role in ssoRoles"
                                         :key="role.value"
                                         :value="role.value"
                                     >

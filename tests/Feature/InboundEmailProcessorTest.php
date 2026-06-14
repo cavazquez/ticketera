@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\DataTransferObjects\IncomingEmailAttachment;
 use App\DataTransferObjects\IncomingEmailMessage;
 use App\Enums\UserRole;
 use App\Models\Department;
@@ -10,6 +11,7 @@ use App\Models\Setting;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Services\InboundEmailProcessor;
+use App\Services\TicketAttachmentService;
 use App\Support\TicketReplyToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -240,6 +242,78 @@ class InboundEmailProcessorTest extends TestCase
             'ticket_id' => $ticket->id,
             'body' => 'No debería poder responder.',
         ]);
+    }
+
+    public function test_stores_only_allowed_inbound_attachments(): void
+    {
+        Notification::fake();
+
+        Setting::current()->update(['inbound_email_enabled' => true]);
+        Department::create(['name' => 'Soporte']);
+
+        $ticket = app(InboundEmailProcessor::class)->process(
+            $this->message([
+                'subject' => 'Con adjuntos',
+                'attachments' => [
+                    new IncomingEmailAttachment('documento.pdf', 'contenido-valido', 'application/pdf'),
+                    new IncomingEmailAttachment('malware.exe', 'binario-peligroso', 'application/octet-stream'),
+                    new IncomingEmailAttachment('script.sh', '#!/bin/sh', 'text/x-shellscript'),
+                ],
+            ])
+        );
+
+        $this->assertNotNull($ticket);
+        $this->assertSame(1, $ticket->attachments()->count());
+        $this->assertDatabaseHas('ticket_attachments', [
+            'ticket_id' => $ticket->id,
+            'original_name' => 'documento.pdf',
+        ]);
+        $this->assertDatabaseMissing('ticket_attachments', ['original_name' => 'malware.exe']);
+    }
+
+    public function test_rejects_oversized_inbound_attachment(): void
+    {
+        Notification::fake();
+
+        Setting::current()->update(['inbound_email_enabled' => true]);
+        Department::create(['name' => 'Soporte']);
+
+        $oversized = str_repeat('a', TicketAttachmentService::MAX_FILE_BYTES + 1);
+
+        $ticket = app(InboundEmailProcessor::class)->process(
+            $this->message([
+                'subject' => 'Adjunto enorme',
+                'attachments' => [
+                    new IncomingEmailAttachment('gigante.pdf', $oversized, 'application/pdf'),
+                ],
+            ])
+        );
+
+        $this->assertNotNull($ticket);
+        $this->assertSame(0, $ticket->attachments()->count());
+    }
+
+    public function test_caps_number_of_inbound_attachments(): void
+    {
+        Notification::fake();
+
+        Setting::current()->update(['inbound_email_enabled' => true]);
+        Department::create(['name' => 'Soporte']);
+
+        $attachments = [];
+        for ($i = 0; $i < TicketAttachmentService::MAX_FILES + 3; $i++) {
+            $attachments[] = new IncomingEmailAttachment("doc-{$i}.pdf", "contenido-{$i}", 'application/pdf');
+        }
+
+        $ticket = app(InboundEmailProcessor::class)->process(
+            $this->message([
+                'subject' => 'Muchos adjuntos',
+                'attachments' => $attachments,
+            ])
+        );
+
+        $this->assertNotNull($ticket);
+        $this->assertSame(TicketAttachmentService::MAX_FILES, $ticket->attachments()->count());
     }
 
     public function test_rejects_email_with_invalid_signed_token(): void

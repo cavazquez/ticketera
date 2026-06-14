@@ -147,8 +147,14 @@ class InboundEmailProcessor
         array $attachments,
         ?TicketReply $reply = null,
     ): void {
+        $stored = 0;
+
         foreach ($attachments as $attachment) {
-            $this->attachments->storeFromContents(
+            if ($stored >= TicketAttachmentService::MAX_FILES) {
+                break;
+            }
+
+            $wasStored = $this->attachments->storeFromContents(
                 $ticket,
                 $user,
                 $attachment->filename,
@@ -156,6 +162,10 @@ class InboundEmailProcessor
                 $attachment->mimeType,
                 $reply,
             );
+
+            if ($wasStored) {
+                $stored++;
+            }
         }
     }
 

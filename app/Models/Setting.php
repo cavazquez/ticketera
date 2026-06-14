@@ -151,7 +151,7 @@ class Setting extends Model
             'turnstile_secret_key' => null,
             'auth_driver' => AuthDriver::Local->value,
             'allow_local_login' => true,
-            'sso_auto_provision' => true,
+            'sso_auto_provision' => false,
             'sso_default_role' => 'cliente',
             'ldap_host' => null,
             'ldap_port' => 389,

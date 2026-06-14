@@ -43,6 +43,10 @@ class SettingsController extends Controller
             'userRoles' => collect(UserRole::cases())
                 ->map(fn ($role) => ['value' => $role->value, 'label' => $role->label()])
                 ->values(),
+            'ssoRoles' => collect(UserRole::cases())
+                ->reject(fn ($role) => $role === UserRole::Admin)
+                ->map(fn ($role) => ['value' => $role->value, 'label' => $role->label()])
+                ->values(),
             'keycloakCallbackUrl' => route('auth.keycloak.callback', absolute: true),
             'timezones' => TimezoneOptions::grouped(),
             'locales' => LocaleManager::labels(),

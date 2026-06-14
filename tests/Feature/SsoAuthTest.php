@@ -53,16 +53,43 @@ class SsoAuthTest extends TestCase
         );
     }
 
-    public function test_existing_user_is_updated_on_sso_login(): void
+    public function test_local_account_is_not_taken_over_by_sso_email_match(): void
     {
-        $existing = User::factory()->create([
+        $local = User::factory()->create([
             'email' => 'existente@empresa.com',
-            'name' => 'Nombre Viejo',
+            'name' => 'Cuenta Local',
             'auth_provider' => AuthProvider::Local,
         ]);
 
+        try {
+            app(SsoUserProvisioner::class)->provision(
+                email: 'existente@empresa.com',
+                name: 'Impostor',
+                provider: AuthProvider::Keycloak,
+                externalId: 'kc-456',
+            );
+            $this->fail('Se esperaba que la provisión SSO rechazara la cuenta local.');
+        } catch (ValidationException) {
+            // expected
+        }
+
+        $local->refresh();
+        $this->assertSame('Cuenta Local', $local->name);
+        $this->assertSame(AuthProvider::Local, $local->auth_provider);
+        $this->assertNull($local->external_id);
+    }
+
+    public function test_existing_sso_user_is_updated_on_login(): void
+    {
+        $existing = User::factory()->create([
+            'email' => 'sso@empresa.com',
+            'name' => 'Nombre Viejo',
+            'auth_provider' => AuthProvider::Keycloak,
+            'external_id' => 'kc-456',
+        ]);
+
         $user = app(SsoUserProvisioner::class)->provision(
-            email: 'existente@empresa.com',
+            email: 'sso@empresa.com',
             name: 'Nombre Nuevo',
             provider: AuthProvider::Keycloak,
             externalId: 'kc-456',
@@ -71,6 +98,24 @@ class SsoAuthTest extends TestCase
         $this->assertSame($existing->id, $user->id);
         $this->assertSame('Nombre Nuevo', $user->fresh()->name);
         $this->assertSame(AuthProvider::Keycloak, $user->fresh()->auth_provider);
+    }
+
+    public function test_admin_role_is_never_auto_provisioned_via_sso(): void
+    {
+        Setting::current()->update([
+            'sso_auto_provision' => true,
+            'sso_default_role' => UserRole::Admin->value,
+        ]);
+
+        $user = app(SsoUserProvisioner::class)->provision(
+            email: 'nuevo-admin@empresa.com',
+            name: 'Nuevo',
+            provider: AuthProvider::Keycloak,
+            externalId: 'kc-999',
+        );
+
+        $this->assertNotSame(UserRole::Admin, $user->role);
+        $this->assertSame(UserRole::Client, $user->role);
     }
 
     public function test_login_page_shows_keycloak_button_when_configured(): void

@@ -19,7 +19,7 @@ trait ValidatesTicketAttachments
             'attachments.*' => [
                 'file',
                 'max:'.TicketAttachmentService::MAX_FILE_KILOBYTES,
-                'mimes:pdf,jpg,jpeg,png,gif,webp,txt,csv,doc,docx,xls,xlsx,zip',
+                'mimes:'.implode(',', TicketAttachmentService::ALLOWED_EXTENSIONS),
             ],
         ];
     }
