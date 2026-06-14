@@ -20,14 +20,15 @@ Abrí http://127.0.0.1:8000
 
 ## Servicios Docker
 
-| Servicio  | Contenedor        | Puerto | Descripción                          |
-| --------- | ----------------- | ------ | ------------------------------------ |
-| `mariadb` | ticketera-mariadb | 3307   | Base de datos                        |
-| `redis`   | ticketera-redis   | 6379   | Cache, sesiones y colas              |
-| `app`     | ticketera-app     | —      | PHP-FPM (procesa requests vía Nginx) |
-| `nginx`   | ticketera-nginx   | 8000   | Servidor web                         |
-| `queue`   | ticketera-queue   | —      | Worker de colas (emails, etc.)       |
-| `vite`    | ticketera-vite    | 5173   | Frontend hot reload                  |
+| Servicio    | Contenedor          | Puerto | Descripción                           |
+| ----------- | ------------------- | ------ | ------------------------------------- |
+| `mariadb`   | ticketera-mariadb   | 3307   | Base de datos                         |
+| `redis`     | ticketera-redis     | 6379   | Cache, sesiones y colas               |
+| `app`       | ticketera-app       | —      | PHP-FPM (procesa requests vía Nginx)  |
+| `nginx`     | ticketera-nginx     | 8000   | Servidor web                          |
+| `queue`     | ticketera-queue     | —      | Worker de colas (emails, etc.)        |
+| `scheduler` | ticketera-scheduler | —      | Tareas programadas (SLA + email IMAP) |
+| `vite`      | ticketera-vite      | 5173   | Frontend hot reload                   |
 
 ## Comandos útiles
 
@@ -78,6 +79,56 @@ Optimizaciones para uso intensivo incluidas por defecto en Docker:
 Ver logs del worker: `docker compose logs -f queue`
 
 Configuración FPM/Nginx en `docker/php/` y `docker/nginx/`.
+
+## Despliegue a producción
+
+El stack de desarrollo (`docker-compose.yml`) usa bind mounts y el dev server de
+Vite, y **no** es apto para producción. Para producción se usa una imagen
+autocontenida (`Dockerfile.prod`) y un compose aparte (`docker-compose.prod.yml`).
+
+Diferencias clave de la imagen de producción:
+
+- Multi-stage: compila los assets con Vite y luego `composer install --no-dev --optimize-autoloader`.
+- Código, dependencias y assets quedan **dentro de la imagen** (sin bind mounts).
+- Opcache con `validate_timestamps=0` + JIT, PHP-FPM corre como `www-data`.
+- En cada arranque cachea config/rutas/vistas (`php artisan optimize`); el servicio `app` corre migraciones (`RUN_MIGRATIONS=true`).
+- Healthchecks en `app` (FastCGI ping), `nginx` (`/up`), `queue` y `scheduler`.
+- Backups automáticos de MariaDB con retención (servicio `backup`).
+
+### Pasos
+
+```bash
+cp .env.production.example .env.production
+# Generá APP_KEY y pegalo en .env.production:
+docker compose -f docker-compose.prod.yml --env-file .env.production run --rm app php artisan key:generate --show
+
+# Editá .env.production: APP_URL, DB_PASSWORD, DB_ROOT_PASSWORD, etc.
+
+# Levantar todo:
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+```
+
+Poné un proxy/terminador TLS (Caddy, Traefik, Nginx) delante del puerto `HTTP_PORT`
+para servir HTTPS. El endpoint `/up` verifica DB + Redis y sirve como health check
+para el balanceador.
+
+### Backups de la base
+
+El servicio `backup` genera un dump comprimido cada `BACKUP_INTERVAL_SECONDS`
+(por defecto 24 h) y conserva los últimos `BACKUP_KEEP` (7) en el volumen
+`ticketera-backups`. Backup manual puntual:
+
+```bash
+./bin/backup-db.sh ./backups          # genera ./backups/ticketera-<fecha>.sql.gz
+```
+
+Restaurar:
+
+```bash
+gunzip -c backups/ticketera-AAAAMMDD-HHMMSS.sql.gz \
+  | docker compose -f docker-compose.prod.yml exec -T mariadb \
+      sh -c 'mariadb -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE"'
+```
 
 ## Usuarios demo
 

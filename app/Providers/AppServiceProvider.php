@@ -8,12 +8,15 @@ use App\Models\Setting;
 use App\Services\MailConfigurator;
 use App\Support\LocaleManager;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -37,11 +40,31 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(Looping::class, function (): void {
             Cache::put('system_health:queue_heartbeat', now()->timestamp, 300);
         });
+        Event::listen(DiagnosingHealth::class, $this->checkInfrastructureHealth(...));
 
         $this->configureMailFromSettings();
         $this->configureTimezoneFromSettings();
         $this->configureLocaleFromSettings();
         $this->configureRateLimiting();
+    }
+
+    /**
+     * Verify critical dependencies when Laravel's /up health endpoint is hit.
+     * Throwing here makes /up return a 5xx so load balancers can react.
+     */
+    private function checkInfrastructureHealth(): void
+    {
+        DB::connection()->getPdo();
+
+        $usesRedis = in_array('redis', [
+            config('cache.default'),
+            config('queue.default'),
+            config('session.driver'),
+        ], true);
+
+        if ($usesRedis) {
+            Redis::connection()->ping();
+        }
     }
 
     private function configureMailFromSettings(): void

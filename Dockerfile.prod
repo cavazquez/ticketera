@@ -1,0 +1,57 @@
+# syntax=docker/dockerfile:1
+
+# --- Stage 1: Composer dependencies (needed by Vite for tightenco/ziggy) ---
+FROM composer:2 AS vendor
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev --no-scripts --no-autoloader --prefer-dist \
+    --no-interaction --ignore-platform-reqs
+
+# --- Stage 2: compile frontend assets ---
+FROM node:24-alpine AS assets
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+# Ziggy ships its JS entrypoint inside the Composer package.
+COPY --from=vendor /app/vendor ./vendor
+RUN npm run build
+
+# --- Stage 3: PHP runtime image ---
+FROM php:8.3-fpm AS runtime
+
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git unzip libfcgi-bin procps \
+    && install-php-extensions pdo_mysql mbstring xml ldap opcache imap redis \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY docker/php/custom.ini /usr/local/etc/php/conf.d/99-ticketera.ini
+COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/10-opcache.ini
+COPY docker/php/fpm-pool.prod.conf /usr/local/etc/php-fpm.d/zz-ticketera.conf
+COPY docker/php/php-fpm-healthcheck /usr/local/bin/php-fpm-healthcheck
+COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint
+RUN chmod +x /usr/local/bin/php-fpm-healthcheck /usr/local/bin/entrypoint
+
+WORKDIR /var/www/html
+
+# Application source (vendor/node_modules/public-build/storage excluded via .dockerignore).
+COPY . .
+# Composer packages from the vendor stage and compiled assets from the node stage.
+COPY --from=vendor /app/vendor ./vendor
+COPY --from=assets /app/public/build ./public/build
+
+# Regenerate the optimized autoloader and run package discovery now that the
+# full application source is present.
+RUN composer dump-autoload --optimize --no-dev --no-interaction \
+    && mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views \
+        storage/logs storage/app/private storage/app/public bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R ug+rwx storage bootstrap/cache
+
+EXPOSE 9000
+
+ENTRYPOINT ["entrypoint"]
+CMD ["php-fpm"]

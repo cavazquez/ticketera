@@ -1,0 +1,8 @@
+#!/bin/sh
+# Pings the PHP-FPM pool over FastCGI. Returns non-zero if it does not respond.
+set -e
+
+SCRIPT_NAME=/ping \
+SCRIPT_FILENAME=/ping \
+REQUEST_METHOD=GET \
+cgi-fcgi -bind -connect 127.0.0.1:9000
