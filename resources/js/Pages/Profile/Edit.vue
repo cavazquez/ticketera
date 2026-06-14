@@ -3,7 +3,10 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
+import { useTrans } from '@/composables/useTrans';
 import { Head } from '@inertiajs/vue3';
+
+const { t } = useTrans();
 
 defineProps({
     mustVerifyEmail: {
@@ -16,11 +19,13 @@ defineProps({
 </script>
 
 <template>
-    <Head title="Perfil" />
+    <Head :title="t('nav.profile')" />
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Perfil</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                {{ t('nav.profile') }}
+            </h2>
         </template>
 
         <div class="py-12">

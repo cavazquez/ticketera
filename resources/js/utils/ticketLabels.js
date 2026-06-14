@@ -41,24 +41,3 @@ export function useTicketLabels() {
 
     return { statusLabels, priorityLabels, roleLabels, statusColor, priorityColor };
 }
-
-// Backward-compatible static exports (fallback Spanish)
-export const statusLabels = {
-    abierto: 'Abierto',
-    en_progreso: 'En progreso',
-    resuelto: 'Resuelto',
-    cerrado: 'Cerrado',
-};
-
-export const priorityLabels = {
-    baja: 'Baja',
-    normal: 'Normal',
-    alta: 'Alta',
-    urgente: 'Urgente',
-};
-
-export const roleLabels = {
-    cliente: 'Cliente',
-    agente: 'Agente',
-    admin: 'Administrador',
-};

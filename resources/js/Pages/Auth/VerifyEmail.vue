@@ -2,7 +2,10 @@
 import { computed } from 'vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import { useTrans } from '@/composables/useTrans';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+
+const { t } = useTrans();
 
 const props = defineProps({
     status: {
@@ -21,15 +24,14 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
 
 <template>
     <GuestLayout>
-        <Head title="Verificar correo" />
+        <Head :title="t('auth.verify_title')" />
 
         <div class="mb-4 text-sm text-gray-600">
-            ¡Gracias por registrarte! Antes de comenzar, verificá tu correo electrónico haciendo
-            clic en el enlace que te enviamos. Si no lo recibiste, podemos enviarte otro.
+            {{ t('auth.verify_intro') }}
         </div>
 
         <div class="mb-4 text-sm font-medium text-green-600" v-if="verificationLinkSent">
-            Se envió un nuevo enlace de verificación al correo que registraste.
+            {{ t('auth.verify_link_sent') }}
         </div>
 
         <form @submit.prevent="submit">
@@ -38,7 +40,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Reenviar correo de verificación
+                    {{ t('auth.resend_verification') }}
                 </PrimaryButton>
 
                 <Link
@@ -47,7 +49,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
                     as="button"
                     class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                    Cerrar sesión
+                    {{ t('nav.logout') }}
                 </Link>
             </div>
         </form>

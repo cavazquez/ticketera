@@ -5,7 +5,10 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import PasswordInput from '@/Components/PasswordInput.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { useTrans } from '@/composables/useTrans';
 import { Head, useForm } from '@inertiajs/vue3';
+
+const { t } = useTrans();
 
 const props = defineProps({
     email: {
@@ -34,11 +37,11 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Restablecer contraseña" />
+        <Head :title="t('auth.reset_title')" />
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="email" value="Correo electrónico" />
+                <InputLabel for="email" :value="t('auth.email')" />
 
                 <TextInput
                     id="email"
@@ -54,7 +57,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Contraseña" />
+                <InputLabel for="password" :value="t('auth.password')" />
 
                 <PasswordInput
                     id="password"
@@ -68,7 +71,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password_confirmation" value="Confirmar contraseña" />
+                <InputLabel for="password_confirmation" :value="t('agents.confirm_password')" />
 
                 <PasswordInput
                     id="password_confirmation"
@@ -86,7 +89,7 @@ const submit = () => {
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Restablecer contraseña
+                    {{ t('auth.reset_title') }}
                 </PrimaryButton>
             </div>
         </form>

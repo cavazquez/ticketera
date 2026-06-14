@@ -6,8 +6,11 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { useTrans } from '@/composables/useTrans';
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+
+const { t } = useTrans();
 
 defineProps({
     cannedResponses: Array,
@@ -62,19 +65,19 @@ const submitEdit = (id) => {
 };
 
 const destroyCanned = (id) => {
-    if (confirm('¿Eliminar esta respuesta predefinida?')) {
+    if (confirm(t('cr.confirm_delete'))) {
         useForm({}).delete(route('panel.canned-responses.destroy', id));
     }
 };
 </script>
 
 <template>
-    <Head title="Respuestas predefinidas" />
+    <Head :title="t('cr.title')" />
 
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Respuestas predefinidas
+                {{ t('cr.title') }}
             </h2>
         </template>
 
@@ -83,15 +86,15 @@ const destroyCanned = (id) => {
                 <FlashMessage />
 
                 <div class="rounded-lg bg-white p-6 shadow-sm">
-                    <h3 class="mb-1 font-semibold">Nueva macro</h3>
+                    <h3 class="mb-1 font-semibold">{{ t('cr.new') }}</h3>
                     <p class="mb-4 text-sm text-gray-600">
-                        Placeholders: <code>{cliente}</code>, <code>{numero}</code>,
+                        {{ t('cr.placeholders') }} <code>{cliente}</code>, <code>{numero}</code>,
                         <code>{asunto}</code>
                     </p>
                     <form @submit.prevent="submitCreate" class="space-y-4">
                         <div class="grid gap-4 md:grid-cols-2">
                             <div>
-                                <InputLabel for="title" value="Título" />
+                                <InputLabel for="title" :value="t('cr.title_label')" />
                                 <TextInput
                                     id="title"
                                     v-model="createForm.title"
@@ -101,13 +104,15 @@ const destroyCanned = (id) => {
                                 <InputError class="mt-2" :message="createForm.errors.title" />
                             </div>
                             <div>
-                                <InputLabel for="department_id" value="Departamento" />
+                                <InputLabel for="department_id" :value="t('common.department')" />
                                 <select
                                     id="department_id"
                                     v-model="createForm.department_id"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                                 >
-                                    <option value="">Todos los departamentos</option>
+                                    <option value="">
+                                        {{ t('panel.tickets.all_departments') }}
+                                    </option>
                                     <option
                                         v-for="dept in departments"
                                         :key="dept.id"
@@ -119,7 +124,7 @@ const destroyCanned = (id) => {
                             </div>
                         </div>
                         <div>
-                            <InputLabel for="body" value="Contenido" />
+                            <InputLabel for="body" :value="t('cr.content')" />
                             <textarea
                                 id="body"
                                 v-model="createForm.body"
@@ -129,7 +134,9 @@ const destroyCanned = (id) => {
                             />
                             <InputError class="mt-2" :message="createForm.errors.body" />
                         </div>
-                        <PrimaryButton :disabled="createForm.processing">Crear macro</PrimaryButton>
+                        <PrimaryButton :disabled="createForm.processing">{{
+                            t('cr.create')
+                        }}</PrimaryButton>
                     </form>
                 </div>
 
@@ -140,22 +147,22 @@ const destroyCanned = (id) => {
                                 <th
                                     class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Título
+                                    {{ t('cr.title_label') }}
                                 </th>
                                 <th
                                     class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Departamento
+                                    {{ t('common.department') }}
                                 </th>
                                 <th
                                     class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Estado
+                                    {{ t('common.status') }}
                                 </th>
                                 <th
                                     class="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Acciones
+                                    {{ t('common.actions') }}
                                 </th>
                             </tr>
                         </thead>
@@ -165,7 +172,7 @@ const destroyCanned = (id) => {
                                     <form @submit.prevent="submitEdit(canned.id)" class="space-y-4">
                                         <div class="grid gap-4 md:grid-cols-2">
                                             <div>
-                                                <InputLabel value="Título" />
+                                                <InputLabel :value="t('cr.title_label')" />
                                                 <TextInput
                                                     v-model="editForm.title"
                                                     class="mt-1 block w-full"
@@ -173,12 +180,12 @@ const destroyCanned = (id) => {
                                                 />
                                             </div>
                                             <div>
-                                                <InputLabel value="Departamento" />
+                                                <InputLabel :value="t('common.department')" />
                                                 <select
                                                     v-model="editForm.department_id"
                                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                                                 >
-                                                    <option value="">Todos</option>
+                                                    <option value="">{{ t('cr.all') }}</option>
                                                     <option
                                                         v-for="dept in departments"
                                                         :key="dept.id"
@@ -201,17 +208,17 @@ const destroyCanned = (id) => {
                                                 type="checkbox"
                                                 class="rounded border-gray-300"
                                             />
-                                            Activa
+                                            {{ t('cr.active') }}
                                         </label>
                                         <div class="flex gap-2">
                                             <PrimaryButton :disabled="editForm.processing">
-                                                Guardar
+                                                {{ t('common.save') }}
                                             </PrimaryButton>
                                             <SecondaryButton
                                                 type="button"
                                                 @click="editingId = null"
                                             >
-                                                Cancelar
+                                                {{ t('common.cancel') }}
                                             </SecondaryButton>
                                         </div>
                                     </form>
@@ -224,10 +231,10 @@ const destroyCanned = (id) => {
                                         </p>
                                     </td>
                                     <td class="px-4 py-3 text-sm">
-                                        {{ canned.department?.name || 'Todos' }}
+                                        {{ canned.department?.name || t('cr.all') }}
                                     </td>
                                     <td class="px-4 py-3 text-sm">
-                                        {{ canned.is_active ? 'Activa' : 'Inactiva' }}
+                                        {{ canned.is_active ? t('cr.active') : t('cr.inactive') }}
                                     </td>
                                     <td class="space-x-2 px-4 py-3 text-right text-sm">
                                         <button
@@ -235,14 +242,14 @@ const destroyCanned = (id) => {
                                             class="text-indigo-600 hover:text-indigo-800"
                                             @click="startEdit(canned)"
                                         >
-                                            Editar
+                                            {{ t('common.edit') }}
                                         </button>
                                         <button
                                             type="button"
                                             class="text-red-600 hover:text-red-800"
                                             @click="destroyCanned(canned.id)"
                                         >
-                                            Eliminar
+                                            {{ t('common.delete') }}
                                         </button>
                                     </td>
                                 </template>

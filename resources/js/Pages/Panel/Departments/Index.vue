@@ -5,8 +5,11 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { useTrans } from '@/composables/useTrans';
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+
+const { t } = useTrans();
 
 defineProps({
     departments: Array,
@@ -47,18 +50,20 @@ const submitEdit = (departmentId) => {
 };
 
 const destroyDepartment = (departmentId) => {
-    if (confirm('¿Eliminar este departamento?')) {
+    if (confirm(t('departments.confirm_delete'))) {
         useForm({}).delete(route('panel.departments.destroy', departmentId));
     }
 };
 </script>
 
 <template>
-    <Head title="Departamentos" />
+    <Head :title="t('nav.departments')" />
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Departamentos</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                {{ t('nav.departments') }}
+            </h2>
         </template>
 
         <div class="py-12">
@@ -66,10 +71,10 @@ const destroyDepartment = (departmentId) => {
                 <FlashMessage />
 
                 <div class="rounded-lg bg-white p-6 shadow-sm">
-                    <h3 class="mb-4 font-semibold">Nuevo departamento</h3>
+                    <h3 class="mb-4 font-semibold">{{ t('departments.new') }}</h3>
                     <form @submit.prevent="submitCreate" class="grid gap-4 md:grid-cols-2">
                         <div>
-                            <InputLabel for="name" value="Nombre" />
+                            <InputLabel for="name" :value="t('common.name')" />
                             <TextInput
                                 id="name"
                                 v-model="createForm.name"
@@ -79,7 +84,7 @@ const destroyDepartment = (departmentId) => {
                             <InputError class="mt-2" :message="createForm.errors.name" />
                         </div>
                         <div>
-                            <InputLabel for="description" value="Descripción" />
+                            <InputLabel for="description" :value="t('common.description')" />
                             <TextInput
                                 id="description"
                                 v-model="createForm.description"
@@ -87,9 +92,9 @@ const destroyDepartment = (departmentId) => {
                             />
                         </div>
                         <div class="md:col-span-2">
-                            <PrimaryButton :disabled="createForm.processing"
-                                >Crear departamento</PrimaryButton
-                            >
+                            <PrimaryButton :disabled="createForm.processing">{{
+                                t('departments.create')
+                            }}</PrimaryButton>
                         </div>
                     </form>
                 </div>
@@ -101,22 +106,22 @@ const destroyDepartment = (departmentId) => {
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Nombre
+                                    {{ t('common.name') }}
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Tickets
+                                    {{ t('departments.tickets') }}
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Agentes
+                                    {{ t('departments.agents') }}
                                 </th>
                                 <th
                                     class="px-6 py-3 text-right text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Acciones
+                                    {{ t('common.actions') }}
                                 </th>
                             </tr>
                         </thead>
@@ -141,7 +146,7 @@ const destroyDepartment = (departmentId) => {
                                             class="text-indigo-600 hover:text-indigo-800"
                                             @click="submitEdit(department.id)"
                                         >
-                                            Guardar
+                                            {{ t('common.save') }}
                                         </button>
                                     </template>
                                     <template v-else>
@@ -149,13 +154,13 @@ const destroyDepartment = (departmentId) => {
                                             class="mr-3 text-indigo-600 hover:text-indigo-800"
                                             @click="startEdit(department)"
                                         >
-                                            Editar
+                                            {{ t('common.edit') }}
                                         </button>
                                         <button
                                             class="text-red-600 hover:text-red-800"
                                             @click="destroyDepartment(department.id)"
                                         >
-                                            Eliminar
+                                            {{ t('common.delete') }}
                                         </button>
                                     </template>
                                 </td>

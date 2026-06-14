@@ -10,8 +10,14 @@ import TicketActivityLog from '@/Components/TicketActivityLog.vue';
 import TicketAttachmentInput from '@/Components/TicketAttachmentInput.vue';
 import TicketAttachmentList from '@/Components/TicketAttachmentList.vue';
 import TicketReplyList from '@/Components/TicketReplyList.vue';
-import { priorityColor, priorityLabels, statusColor, statusLabels } from '@/utils/ticketLabels';
+import { priorityColor, statusColor, useTicketLabels } from '@/utils/ticketLabels';
+import { useTrans } from '@/composables/useTrans';
+import { useFormat } from '@/composables/useFormat';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+
+const { t } = useTrans();
+const { formatDateTime } = useFormat();
+const { statusLabels, priorityLabels } = useTicketLabels();
 
 const props = defineProps({
     ticket: Object,
@@ -83,7 +89,7 @@ const applyCannedResponse = (event) => {
                     :href="route('panel.tickets.index')"
                     class="text-sm text-indigo-600 hover:text-indigo-800"
                 >
-                    ← Volver a la cola
+                    ← {{ t('ticket.back_to_queue') }}
                 </Link>
                 <h2 class="mt-2 text-xl font-semibold leading-tight text-gray-800">
                     {{ ticket.number }} · {{ ticket.subject }}
@@ -99,9 +105,11 @@ const applyCannedResponse = (event) => {
                     <div class="space-y-4 lg:col-span-2">
                         <div class="rounded-lg bg-white p-6 shadow-sm">
                             <div class="mb-2 flex items-center justify-between">
-                                <p class="font-medium">{{ ticket.user?.name }} (Cliente)</p>
+                                <p class="font-medium">
+                                    {{ ticket.user?.name }} ({{ t('user.role.cliente') }})
+                                </p>
                                 <p class="text-xs text-gray-500">
-                                    {{ new Date(ticket.created_at).toLocaleString('es-AR') }}
+                                    {{ formatDateTime(ticket.created_at) }}
                                 </p>
                             </div>
                             <p class="whitespace-pre-wrap text-gray-700">{{ ticket.body }}</p>
@@ -115,14 +123,14 @@ const applyCannedResponse = (event) => {
                                 <div v-if="cannedResponses.length">
                                     <InputLabel
                                         for="canned_response"
-                                        value="Respuesta predefinida"
+                                        :value="t('ticket.canned_response')"
                                     />
                                     <select
                                         id="canned_response"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                                         @change="applyCannedResponse"
                                     >
-                                        <option value="">Insertar macro…</option>
+                                        <option value="">{{ t('ticket.insert_macro') }}</option>
                                         <option
                                             v-for="canned in cannedResponses"
                                             :key="canned.id"
@@ -133,7 +141,7 @@ const applyCannedResponse = (event) => {
                                     </select>
                                 </div>
                                 <div>
-                                    <InputLabel for="body" value="Responder" />
+                                    <InputLabel for="body" :value="t('ticket.reply')" />
                                     <textarea
                                         id="body"
                                         v-model="replyForm.body"
@@ -156,18 +164,20 @@ const applyCannedResponse = (event) => {
                                         type="checkbox"
                                         class="rounded border-gray-300"
                                     />
-                                    Nota interna (solo visible para agentes)
+                                    {{ t('ticket.internal_note_hint') }}
                                 </label>
-                                <PrimaryButton :disabled="replyForm.processing"
-                                    >Enviar</PrimaryButton
-                                >
+                                <PrimaryButton :disabled="replyForm.processing">{{
+                                    t('common.send')
+                                }}</PrimaryButton>
                             </form>
                         </div>
                     </div>
 
                     <div class="space-y-6">
                         <div class="rounded-lg bg-white p-6 shadow-sm">
-                            <h3 class="mb-4 font-semibold text-gray-900">Detalles</h3>
+                            <h3 class="mb-4 font-semibold text-gray-900">
+                                {{ t('ticket.details') }}
+                            </h3>
                             <div class="mb-4 flex flex-wrap gap-2">
                                 <Badge
                                     :label="statusLabels[ticket.status]"
@@ -180,23 +190,23 @@ const applyCannedResponse = (event) => {
                             </div>
                             <dl class="space-y-2 text-sm">
                                 <div>
-                                    <dt class="text-gray-500">Cliente</dt>
+                                    <dt class="text-gray-500">{{ t('common.client') }}</dt>
                                     <dd class="font-medium">{{ ticket.user?.name }}</dd>
                                 </div>
                                 <div>
-                                    <dt class="text-gray-500">Email</dt>
+                                    <dt class="text-gray-500">{{ t('common.email') }}</dt>
                                     <dd>{{ ticket.user?.email }}</dd>
                                 </div>
                                 <div>
-                                    <dt class="text-gray-500">Departamento</dt>
+                                    <dt class="text-gray-500">{{ t('common.department') }}</dt>
                                     <dd>{{ ticket.department?.name }}</dd>
                                 </div>
                                 <div>
-                                    <dt class="text-gray-500">Asignado a</dt>
-                                    <dd>{{ ticket.assignee?.name || 'Sin asignar' }}</dd>
+                                    <dt class="text-gray-500">{{ t('ticket.assigned_to') }}</dt>
+                                    <dd>{{ ticket.assignee?.name || t('common.unassigned') }}</dd>
                                 </div>
                                 <div v-if="ticket.due_at">
-                                    <dt class="text-gray-500">Vencimiento SLA</dt>
+                                    <dt class="text-gray-500">{{ t('ticket.sla_due') }}</dt>
                                     <dd
                                         :class="
                                             new Date(ticket.due_at) < new Date()
@@ -204,17 +214,19 @@ const applyCannedResponse = (event) => {
                                                 : ''
                                         "
                                     >
-                                        {{ new Date(ticket.due_at).toLocaleString('es-AR') }}
+                                        {{ formatDateTime(ticket.due_at) }}
                                     </dd>
                                 </div>
                             </dl>
                         </div>
 
                         <div class="rounded-lg bg-white p-6 shadow-sm">
-                            <h3 class="mb-4 font-semibold text-gray-900">Gestionar ticket</h3>
+                            <h3 class="mb-4 font-semibold text-gray-900">
+                                {{ t('ticket.manage') }}
+                            </h3>
                             <form @submit.prevent="updateTicket" class="space-y-4">
                                 <div>
-                                    <InputLabel for="status" value="Estado" />
+                                    <InputLabel for="status" :value="t('common.status')" />
                                     <select
                                         id="status"
                                         v-model="updateForm.status"
@@ -230,7 +242,7 @@ const applyCannedResponse = (event) => {
                                     </select>
                                 </div>
                                 <div>
-                                    <InputLabel for="priority" value="Prioridad" />
+                                    <InputLabel for="priority" :value="t('common.priority')" />
                                     <select
                                         id="priority"
                                         v-model="updateForm.priority"
@@ -246,13 +258,13 @@ const applyCannedResponse = (event) => {
                                     </select>
                                 </div>
                                 <div>
-                                    <InputLabel for="assigned_to" value="Asignar a" />
+                                    <InputLabel for="assigned_to" :value="t('ticket.assign_to')" />
                                     <select
                                         id="assigned_to"
                                         v-model="updateForm.assigned_to"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                                     >
-                                        <option value="">Sin asignar</option>
+                                        <option value="">{{ t('common.unassigned') }}</option>
                                         <option
                                             v-for="agent in agents"
                                             :key="agent.id"
@@ -263,11 +275,11 @@ const applyCannedResponse = (event) => {
                                     </select>
                                 </div>
                                 <div class="flex flex-col gap-2">
-                                    <PrimaryButton :disabled="updateForm.processing"
-                                        >Guardar cambios</PrimaryButton
-                                    >
+                                    <PrimaryButton :disabled="updateForm.processing">{{
+                                        t('ticket.save_changes')
+                                    }}</PrimaryButton>
                                     <SecondaryButton type="button" @click="assignToMe">
-                                        Asignarme este ticket
+                                        {{ t('ticket.assign_to_me') }}
                                     </SecondaryButton>
                                 </div>
                             </form>

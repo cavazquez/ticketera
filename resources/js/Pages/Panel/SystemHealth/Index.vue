@@ -1,8 +1,11 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
+import { useTrans } from '@/composables/useTrans';
 import { Head, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+
+const { t } = useTrans();
 
 const props = defineProps({
     report: Object,
@@ -29,11 +32,11 @@ const statusClasses = {
     error: 'bg-red-100 text-red-800 ring-red-600/20',
 };
 
-const statusLabels = {
-    ok: 'OK',
-    warning: 'Aviso',
-    error: 'Error',
-};
+const statusLabels = computed(() => ({
+    ok: t('sh.status_ok'),
+    warning: t('sh.status_warning'),
+    error: t('sh.status_error'),
+}));
 
 const summaryBannerClass = computed(() => {
     if (summary.value.error > 0) {
@@ -49,16 +52,16 @@ const summaryBannerClass = computed(() => {
 </script>
 
 <template>
-    <Head title="Diagnóstico del sistema" />
+    <Head :title="t('sh.title')" />
 
     <AuthenticatedLayout>
         <template #header>
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                    Diagnóstico del sistema
+                    {{ t('sh.title') }}
                 </h2>
                 <SecondaryButton :disabled="refreshing" @click="refreshReport">
-                    {{ refreshing ? 'Ejecutando…' : 'Ejecutar diagnóstico' }}
+                    {{ refreshing ? t('sh.running') : t('sh.run') }}
                 </SecondaryButton>
             </div>
         </template>
@@ -71,32 +74,31 @@ const summaryBannerClass = computed(() => {
                             <p class="text-lg font-semibold">
                                 {{
                                     summary.error > 0
-                                        ? 'Hay problemas que requieren atención'
+                                        ? t('sh.has_problems')
                                         : summary.warning > 0
-                                          ? 'Operativo con advertencias'
-                                          : 'Todo en orden'
+                                          ? t('sh.operational_warnings')
+                                          : t('sh.all_good')
                                 }}
                             </p>
                             <p class="mt-1 text-sm opacity-80">
-                                Generado el {{ report.generated_at }} · PHP
+                                {{ t('sh.generated') }} {{ report.generated_at }} · PHP
                                 {{ report.environment.php_version }} · Laravel
                                 {{ report.environment.laravel_version }} ·
                                 {{ report.environment.app_env }}
                             </p>
                             <p class="mt-1 text-xs opacity-70">
-                                Se ejecuta al abrir esta página. Usá «Ejecutar diagnóstico» para
-                                volver a comprobar el estado actual.
+                                {{ t('sh.runs_on_open') }}
                             </p>
                         </div>
                         <div class="flex gap-3 text-sm">
                             <span class="rounded-full bg-white/70 px-3 py-1 font-medium">
-                                {{ summary.ok }} OK
+                                {{ t('sh.oks', { count: summary.ok }) }}
                             </span>
                             <span class="rounded-full bg-white/70 px-3 py-1 font-medium">
-                                {{ summary.warning }} avisos
+                                {{ t('sh.warnings', { count: summary.warning }) }}
                             </span>
                             <span class="rounded-full bg-white/70 px-3 py-1 font-medium">
-                                {{ summary.error }} errores
+                                {{ t('sh.errors', { count: summary.error }) }}
                             </span>
                         </div>
                     </div>

@@ -5,7 +5,10 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import PasswordInput from '@/Components/PasswordInput.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { useTrans } from '@/composables/useTrans';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+
+const { t } = useTrans();
 
 const form = useForm({
     name: '',
@@ -23,11 +26,11 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Registrarse" />
+        <Head :title="t('auth.register')" />
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="name" value="Nombre" />
+                <InputLabel for="name" :value="t('common.name')" />
 
                 <TextInput
                     id="name"
@@ -43,7 +46,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="email" value="Correo electrónico" />
+                <InputLabel for="email" :value="t('auth.email')" />
 
                 <TextInput
                     id="email"
@@ -58,7 +61,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Contraseña" />
+                <InputLabel for="password" :value="t('auth.password')" />
 
                 <PasswordInput
                     id="password"
@@ -72,7 +75,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password_confirmation" value="Confirmar contraseña" />
+                <InputLabel for="password_confirmation" :value="t('agents.confirm_password')" />
 
                 <PasswordInput
                     id="password_confirmation"
@@ -90,7 +93,7 @@ const submit = () => {
                     :href="route('login')"
                     class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                    ¿Ya tenés cuenta?
+                    {{ t('auth.already_have_account') }}
                 </Link>
 
                 <PrimaryButton
@@ -98,7 +101,7 @@ const submit = () => {
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Registrarse
+                    {{ t('auth.register') }}
                 </PrimaryButton>
             </div>
         </form>

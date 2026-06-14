@@ -5,8 +5,11 @@ import InputLabel from '@/Components/InputLabel.vue';
 import Modal from '@/Components/Modal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import PasswordInput from '@/Components/PasswordInput.vue';
+import { useTrans } from '@/composables/useTrans';
 import { useForm } from '@inertiajs/vue3';
 import { nextTick, ref } from 'vue';
+
+const { t } = useTrans();
 
 const confirmingUserDeletion = ref(false);
 const passwordInput = ref(null);
@@ -41,36 +44,34 @@ const closeModal = () => {
 <template>
     <section class="space-y-6">
         <header>
-            <h2 class="text-lg font-medium text-gray-900">Eliminar cuenta</h2>
+            <h2 class="text-lg font-medium text-gray-900">{{ t('profile.delete_title') }}</h2>
 
             <p class="mt-1 text-sm text-gray-600">
-                Una vez eliminada tu cuenta, todos tus datos se borrarán de forma permanente.
-                Descargá cualquier información que quieras conservar antes de continuar.
+                {{ t('profile.delete_intro') }}
             </p>
         </header>
 
-        <DangerButton @click="confirmUserDeletion">Eliminar cuenta</DangerButton>
+        <DangerButton @click="confirmUserDeletion">{{ t('profile.delete_title') }}</DangerButton>
 
         <Modal :show="confirmingUserDeletion" @close="closeModal">
             <div class="p-6">
                 <h2 class="text-lg font-medium text-gray-900">
-                    ¿Estás seguro de que querés eliminar tu cuenta?
+                    {{ t('profile.delete_confirm_title') }}
                 </h2>
 
                 <p class="mt-1 text-sm text-gray-600">
-                    Esta acción no se puede deshacer. Ingresá tu contraseña para confirmar que
-                    querés eliminar tu cuenta permanentemente.
+                    {{ t('profile.delete_confirm_intro') }}
                 </p>
 
                 <div class="mt-6">
-                    <InputLabel for="password" value="Contraseña" class="sr-only" />
+                    <InputLabel for="password" :value="t('auth.password')" class="sr-only" />
 
                     <PasswordInput
                         id="password"
                         ref="passwordInput"
                         v-model="form.password"
                         class="mt-1 block w-3/4"
-                        placeholder="Contraseña"
+                        :placeholder="t('auth.password')"
                         @keyup.enter="deleteUser"
                     />
 
@@ -78,7 +79,7 @@ const closeModal = () => {
                 </div>
 
                 <div class="mt-6 flex justify-end">
-                    <SecondaryButton @click="closeModal"> Cancelar </SecondaryButton>
+                    <SecondaryButton @click="closeModal">{{ t('common.cancel') }}</SecondaryButton>
 
                     <DangerButton
                         class="ms-3"
@@ -86,7 +87,7 @@ const closeModal = () => {
                         :disabled="form.processing"
                         @click="deleteUser"
                     >
-                        Eliminar cuenta
+                        {{ t('profile.delete_title') }}
                     </DangerButton>
                 </div>
             </div>

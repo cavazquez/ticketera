@@ -4,7 +4,10 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { useTrans } from '@/composables/useTrans';
 import { Head, useForm } from '@inertiajs/vue3';
+
+const { t } = useTrans();
 
 defineProps({
     status: {
@@ -23,11 +26,10 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Recuperar contraseña" />
+        <Head :title="t('auth.forgot_title')" />
 
         <div class="mb-4 text-sm text-gray-600">
-            ¿Olvidaste tu contraseña? Indicanos tu correo electrónico y te enviaremos un enlace para
-            restablecerla.
+            {{ t('auth.forgot_intro') }}
         </div>
 
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
@@ -36,7 +38,7 @@ const submit = () => {
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="email" value="Correo electrónico" />
+                <InputLabel for="email" :value="t('auth.email')" />
 
                 <TextInput
                     id="email"
@@ -56,7 +58,7 @@ const submit = () => {
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Enviar enlace de recuperación
+                    {{ t('auth.send_reset_link') }}
                 </PrimaryButton>
             </div>
         </form>

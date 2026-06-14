@@ -7,7 +7,10 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import PasswordInput from '@/Components/PasswordInput.vue';
 import TextInput from '@/Components/TextInput.vue';
+import { useTrans } from '@/composables/useTrans';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+
+const { t } = useTrans();
 
 defineProps({
     canResetPassword: {
@@ -45,7 +48,7 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Iniciar sesión" />
+        <Head :title="t('auth.login')" />
 
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
@@ -54,18 +57,18 @@ const submit = () => {
         <div v-if="keycloakLoginUrl" class="mb-6">
             <a :href="keycloakLoginUrl" class="block w-full">
                 <SecondaryButton type="button" class="w-full justify-center">
-                    Iniciar sesión con Keycloak
+                    {{ t('auth.login_with_keycloak') }}
                 </SecondaryButton>
             </a>
 
             <p v-if="showLocalLogin" class="mt-4 text-center text-sm text-gray-500">
-                o ingresá con tu cuenta local
+                {{ t('auth.or_local') }}
             </p>
         </div>
 
         <form v-if="showLocalLogin" @submit.prevent="submit">
             <div>
-                <InputLabel for="email" value="Correo electrónico" />
+                <InputLabel for="email" :value="t('auth.email')" />
 
                 <TextInput
                     id="email"
@@ -81,7 +84,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Contraseña" />
+                <InputLabel for="password" :value="t('auth.password')" />
 
                 <PasswordInput
                     id="password"
@@ -97,7 +100,7 @@ const submit = () => {
             <div class="mt-4 block">
                 <label class="flex items-center">
                     <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600">Recordarme</span>
+                    <span class="ms-2 text-sm text-gray-600">{{ t('auth.remember') }}</span>
                 </label>
             </div>
 
@@ -107,7 +110,7 @@ const submit = () => {
                     :href="route('password.request')"
                     class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                    ¿Olvidaste tu contraseña?
+                    {{ t('auth.forgot_password') }}
                 </Link>
 
                 <PrimaryButton
@@ -115,7 +118,7 @@ const submit = () => {
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Iniciar sesión
+                    {{ t('auth.login') }}
                 </PrimaryButton>
             </div>
         </form>

@@ -6,9 +6,13 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import PasswordInput from '@/Components/PasswordInput.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { roleLabels } from '@/utils/ticketLabels';
+import { useTicketLabels } from '@/utils/ticketLabels';
+import { useTrans } from '@/composables/useTrans';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+
+const { t } = useTrans();
+const { roleLabels } = useTicketLabels();
 
 defineProps({
     users: Array,
@@ -61,11 +65,11 @@ const submitEdit = (userId) => {
 </script>
 
 <template>
-    <Head title="Usuarios" />
+    <Head :title="t('nav.users')" />
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Usuarios</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ t('nav.users') }}</h2>
         </template>
 
         <div class="py-12">
@@ -73,13 +77,13 @@ const submitEdit = (userId) => {
                 <FlashMessage />
 
                 <div class="rounded-lg bg-white p-6 shadow-sm">
-                    <h3 class="mb-1 font-semibold">Nuevo usuario</h3>
+                    <h3 class="mb-1 font-semibold">{{ t('agents.new') }}</h3>
                     <p class="mb-4 text-sm text-gray-600">
-                        Con el registro público desactivado, los clientes se crean desde acá.
+                        {{ t('agents.new_hint') }}
                     </p>
                     <form @submit.prevent="submitCreate" class="grid gap-4 md:grid-cols-2">
                         <div>
-                            <InputLabel for="name" value="Nombre" />
+                            <InputLabel for="name" :value="t('common.name')" />
                             <TextInput
                                 id="name"
                                 v-model="createForm.name"
@@ -89,7 +93,7 @@ const submitEdit = (userId) => {
                             <InputError class="mt-2" :message="createForm.errors.name" />
                         </div>
                         <div>
-                            <InputLabel for="email" value="Email" />
+                            <InputLabel for="email" :value="t('common.email')" />
                             <TextInput
                                 id="email"
                                 v-model="createForm.email"
@@ -100,7 +104,7 @@ const submitEdit = (userId) => {
                             <InputError class="mt-2" :message="createForm.errors.email" />
                         </div>
                         <div>
-                            <InputLabel for="password" value="Contraseña" />
+                            <InputLabel for="password" :value="t('auth.password')" />
                             <PasswordInput
                                 id="password"
                                 v-model="createForm.password"
@@ -110,7 +114,10 @@ const submitEdit = (userId) => {
                             <InputError class="mt-2" :message="createForm.errors.password" />
                         </div>
                         <div>
-                            <InputLabel for="password_confirmation" value="Confirmar contraseña" />
+                            <InputLabel
+                                for="password_confirmation"
+                                :value="t('agents.confirm_password')"
+                            />
                             <PasswordInput
                                 id="password_confirmation"
                                 v-model="createForm.password_confirmation"
@@ -119,7 +126,7 @@ const submitEdit = (userId) => {
                             />
                         </div>
                         <div>
-                            <InputLabel for="role" value="Rol" />
+                            <InputLabel for="role" :value="t('common.role')" />
                             <select
                                 id="role"
                                 v-model="createForm.role"
@@ -131,14 +138,14 @@ const submitEdit = (userId) => {
                             </select>
                         </div>
                         <div v-if="createNeedsDepartment">
-                            <InputLabel for="department_id" value="Departamento" />
+                            <InputLabel for="department_id" :value="t('common.department')" />
                             <select
                                 id="department_id"
                                 v-model="createForm.department_id"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                                 required
                             >
-                                <option value="">Seleccionar...</option>
+                                <option value="">{{ t('common.select') }}</option>
                                 <option
                                     v-for="department in departments"
                                     :key="department.id"
@@ -150,9 +157,9 @@ const submitEdit = (userId) => {
                             <InputError class="mt-2" :message="createForm.errors.department_id" />
                         </div>
                         <div class="md:col-span-2">
-                            <PrimaryButton :disabled="createForm.processing"
-                                >Crear usuario</PrimaryButton
-                            >
+                            <PrimaryButton :disabled="createForm.processing">{{
+                                t('agents.create')
+                            }}</PrimaryButton>
                         </div>
                     </form>
                 </div>
@@ -164,27 +171,27 @@ const submitEdit = (userId) => {
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Nombre
+                                    {{ t('common.name') }}
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Email
+                                    {{ t('common.email') }}
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Rol
+                                    {{ t('common.role') }}
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Departamento
+                                    {{ t('common.department') }}
                                 </th>
                                 <th
                                     class="px-6 py-3 text-right text-xs font-medium uppercase text-gray-500"
                                 >
-                                    Acciones
+                                    {{ t('common.actions') }}
                                 </th>
                             </tr>
                         </thead>
@@ -244,14 +251,14 @@ const submitEdit = (userId) => {
                                         class="text-indigo-600 hover:text-indigo-800"
                                         @click="submitEdit(user.id)"
                                     >
-                                        Guardar
+                                        {{ t('common.save') }}
                                     </button>
                                     <button
                                         v-else
                                         class="text-indigo-600 hover:text-indigo-800"
                                         @click="startEdit(user)"
                                     >
-                                        Editar
+                                        {{ t('common.edit') }}
                                     </button>
                                 </td>
                             </tr>

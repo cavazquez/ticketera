@@ -4,7 +4,10 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import PasswordInput from '@/Components/PasswordInput.vue';
+import { useTrans } from '@/composables/useTrans';
 import { Head, useForm } from '@inertiajs/vue3';
+
+const { t } = useTrans();
 
 const form = useForm({
     password: '',
@@ -19,15 +22,15 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Confirmar contraseña" />
+        <Head :title="t('auth.confirm_title')" />
 
         <div class="mb-4 text-sm text-gray-600">
-            Esta es un área segura de la aplicación. Confirmá tu contraseña antes de continuar.
+            {{ t('auth.confirm_intro') }}
         </div>
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="password" value="Contraseña" />
+                <InputLabel for="password" :value="t('auth.password')" />
                 <PasswordInput
                     id="password"
                     class="mt-1 block w-full"
@@ -45,7 +48,7 @@ const submit = () => {
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Confirmar
+                    {{ t('auth.confirm_submit') }}
                 </PrimaryButton>
             </div>
         </form>

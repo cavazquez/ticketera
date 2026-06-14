@@ -1,6 +1,9 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import axios from 'axios';
+import { useTrans } from '@/composables/useTrans';
+
+const { t } = useTrans();
 
 const props = defineProps({
     modelValue: {
@@ -22,7 +25,7 @@ const isLoading = ref(false);
 
 const displayLabel = computed(() => {
     if (props.modelValue === 'unassigned') {
-        return 'Sin asignar';
+        return t('common.unassigned');
     }
 
     if (props.selectedAgent && String(props.selectedAgent.id) === String(props.modelValue)) {
@@ -52,7 +55,7 @@ const selectAgent = (value) => {
     isOpen.value = false;
 
     if (value === '' || value === 'unassigned') {
-        query.value = value === 'unassigned' ? 'Sin asignar' : '';
+        query.value = value === 'unassigned' ? t('common.unassigned') : '';
     } else {
         const agent = results.value.find((item) => String(item.id) === String(value));
         query.value = agent?.name || displayLabel.value;
@@ -76,7 +79,7 @@ watch(
         if (!value) {
             query.value = '';
         } else if (value === 'unassigned') {
-            query.value = 'Sin asignar';
+            query.value = t('common.unassigned');
         } else if (props.selectedAgent && String(props.selectedAgent.id) === String(value)) {
             query.value = props.selectedAgent.name;
         }
@@ -97,7 +100,7 @@ onMounted(() => {
             v-model="query"
             type="text"
             class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="Buscar agente..."
+            :placeholder="t('ac.placeholder')"
             autocomplete="off"
             @focus="onFocus"
             @input="onInput"
@@ -112,16 +115,18 @@ onMounted(() => {
                 class="block w-full px-3 py-2 text-left text-sm hover:bg-gray-50"
                 @mousedown.prevent="selectAgent('')"
             >
-                Todos los agentes
+                {{ t('ac.all_agents') }}
             </button>
             <button
                 type="button"
                 class="block w-full px-3 py-2 text-left text-sm hover:bg-gray-50"
                 @mousedown.prevent="selectAgent('unassigned')"
             >
-                Sin asignar
+                {{ t('common.unassigned') }}
             </button>
-            <div v-if="isLoading" class="px-3 py-2 text-sm text-gray-500">Buscando...</div>
+            <div v-if="isLoading" class="px-3 py-2 text-sm text-gray-500">
+                {{ t('ac.searching') }}
+            </div>
             <button
                 v-for="agent in results"
                 :key="agent.id"
@@ -136,7 +141,7 @@ onMounted(() => {
                 v-if="!isLoading && results.length === 0 && query"
                 class="px-3 py-2 text-sm text-gray-500"
             >
-                Sin resultados
+                {{ t('ac.no_results') }}
             </div>
         </div>
     </div>
