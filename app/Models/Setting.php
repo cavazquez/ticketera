@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Cache;
 
 class Setting extends Model
 {
-    private const string CACHE_KEY = 'settings.current';
+    // v2: the cache now stores the full model instead of just the id.
+    private const string CACHE_KEY = 'settings.current.v2';
 
     private const int CACHE_TTL_SECONDS = 300;
 
@@ -115,19 +116,11 @@ class Setting extends Model
             return static::$instance;
         }
 
-        $id = Cache::remember(
+        $setting = Cache::remember(
             self::CACHE_KEY,
             self::CACHE_TTL_SECONDS,
-            fn (): int => (int) static::query()->firstOrCreate([], static::defaultAttributes())->getKey(),
+            fn (): self => static::query()->firstOrCreate([], static::defaultAttributes()),
         );
-
-        $setting = static::query()->find($id);
-
-        if ($setting === null) {
-            static::clearCache();
-
-            return static::current();
-        }
 
         return static::$instance = $setting;
     }

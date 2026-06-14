@@ -14,6 +14,14 @@ class LocaleManager
     /** @var list<string> */
     public const SUPPORTED = ['es', 'en'];
 
+    /**
+     * Per-process cache of decoded translation files. FPM workers are long-lived,
+     * so this avoids re-reading and re-decoding the JSON on every request.
+     *
+     * @var array<string, array<string, string>>
+     */
+    private static array $translations = [];
+
     /** @return array<string, string> */
     public static function labels(): array
     {
@@ -69,14 +77,20 @@ class LocaleManager
     public static function uiTranslations(?string $locale = null): array
     {
         $locale ??= App::getLocale();
+
+        if (isset(self::$translations[$locale])) {
+            return self::$translations[$locale];
+        }
+
         $path = lang_path("{$locale}.json");
 
         if (! File::exists($path)) {
             $path = lang_path('es.json');
         }
 
-        $contents = File::get($path);
+        /** @var array<string, string> $decoded */
+        $decoded = json_decode(File::get($path), true, 512, JSON_THROW_ON_ERROR);
 
-        return json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+        return self::$translations[$locale] = $decoded;
     }
 }

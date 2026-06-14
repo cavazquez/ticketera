@@ -55,29 +55,31 @@ class DashboardMetricsService
      */
     private function departmentBreakdown(User $user, array $openStatuses): array
     {
-        $departmentIds = Department::query()
+        $departments = Department::query()
             ->when($user->isAgent(), fn (Builder $query) => $query->where('id', $user->department_id))
             ->orderBy('name')
-            ->pluck('id');
+            ->get(['id', 'name']);
 
-        return $departmentIds->map(function (int $departmentId) use ($openStatuses, $user) {
-            $department = Department::query()->find($departmentId, ['id', 'name']);
-            $query = $this->scopedTicketsQuery($user)->where('department_id', $departmentId);
+        $openCounts = $this->scopedTicketsQuery($user)
+            ->whereIn('status', $openStatuses)
+            ->selectRaw('department_id, count(*) as aggregate')
+            ->groupBy('department_id')
+            ->pluck('aggregate', 'department_id');
 
-            $openCount = (clone $query)->whereIn('status', $openStatuses)->count();
-            $overdueCount = (clone $query)
-                ->whereIn('status', $openStatuses)
-                ->whereNotNull('due_at')
-                ->where('due_at', '<', now())
-                ->count();
+        $overdueCounts = $this->scopedTicketsQuery($user)
+            ->whereIn('status', $openStatuses)
+            ->whereNotNull('due_at')
+            ->where('due_at', '<', now())
+            ->selectRaw('department_id, count(*) as aggregate')
+            ->groupBy('department_id')
+            ->pluck('aggregate', 'department_id');
 
-            return [
-                'id' => $department?->id,
-                'name' => $department?->name,
-                'open_count' => $openCount,
-                'overdue_count' => $overdueCount,
-            ];
-        })->values()->all();
+        return $departments->map(fn (Department $department): array => [
+            'id' => $department->id,
+            'name' => $department->name,
+            'open_count' => (int) ($openCounts[$department->id] ?? 0),
+            'overdue_count' => (int) ($overdueCounts[$department->id] ?? 0),
+        ])->values()->all();
     }
 
     /** @return Builder<Ticket> */

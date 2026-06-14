@@ -9,8 +9,8 @@ use App\Http\Requests\StoreTicketRequest;
 use App\Models\Department;
 use App\Models\Ticket;
 use App\Services\TicketAttachmentService;
-use App\Services\TicketNotifier;
 use App\Services\TicketReplyPaginator;
+use App\Services\TicketReplyService;
 use App\Services\TicketSetupService;
 use App\Support\EnumOptions;
 use Illuminate\Http\RedirectResponse;
@@ -84,22 +84,19 @@ class TicketController extends Controller
     public function reply(
         StoreTicketReplyRequest $request,
         Ticket $ticket,
-        TicketNotifier $notifier,
-        TicketAttachmentService $attachments,
+        TicketReplyService $replyService,
     ): RedirectResponse {
         $this->authorize('reply', $ticket);
 
         $user = $this->requireUser($request);
 
-        $reply = $ticket->replies()->create([
-            'user_id' => $user->id,
-            'body' => $request->validated('body'),
-            'is_internal' => false,
-        ]);
-
-        $attachments->storeMany($ticket, $user, $request->validatedAttachments(), $reply);
-
-        $notifier->notifyReply($ticket, $reply, $user);
+        $replyService->reply(
+            $ticket,
+            $user,
+            $request->validated('body'),
+            false,
+            $request->validatedAttachments(),
+        );
 
         return back()->with('success', 'Respuesta enviada.');
     }

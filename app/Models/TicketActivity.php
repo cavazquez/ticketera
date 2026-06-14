@@ -41,7 +41,10 @@ class TicketActivity extends Model
         };
     }
 
-    public function formattedChange(): string
+    /**
+     * @param  array<int|string, string>  $userNames  Optional map of user id => name to avoid per-row lookups.
+     */
+    public function formattedChange(array $userNames = []): string
     {
         return match ($this->field) {
             'status' => sprintf(
@@ -54,20 +57,49 @@ class TicketActivity extends Model
                 $this->old_value ? (TicketPriority::tryFrom($this->old_value)?->label() ?? $this->old_value) : '—',
                 $this->new_value ? (TicketPriority::tryFrom($this->new_value)?->label() ?? $this->new_value) : '—',
             ),
-            'assigned_to' => $this->formatAssigneeChange(),
+            'assigned_to' => $this->formatAssigneeChange($userNames),
             default => ($this->old_value ?? '—').' → '.($this->new_value ?? '—'),
         };
     }
 
-    private function formatAssigneeChange(): string
+    /**
+     * User ids referenced by this activity when it is an assignment change.
+     *
+     * @return list<int>
+     */
+    public function referencedUserIds(): array
     {
-        return $this->assigneeLabel($this->old_value).' → '.$this->assigneeLabel($this->new_value);
+        if ($this->field !== 'assigned_to') {
+            return [];
+        }
+
+        return array_values(
+            collect([$this->old_value, $this->new_value])
+                ->filter(fn ($value) => filled($value))
+                ->map(fn ($value) => (int) $value)
+                ->all()
+        );
     }
 
-    private function assigneeLabel(?string $userId): string
+    /**
+     * @param  array<int|string, string>  $userNames
+     */
+    private function formatAssigneeChange(array $userNames): string
+    {
+        return $this->assigneeLabel($this->old_value, $userNames).' → '.$this->assigneeLabel($this->new_value, $userNames);
+    }
+
+    /**
+     * @param  array<int|string, string>  $userNames
+     */
+    private function assigneeLabel(?string $userId, array $userNames): string
     {
         if (blank($userId)) {
             return 'Sin asignar';
+        }
+
+        if (isset($userNames[$userId])) {
+            return $userNames[$userId];
         }
 
         $user = User::query()->find($userId);

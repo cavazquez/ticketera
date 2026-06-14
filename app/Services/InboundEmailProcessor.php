@@ -24,7 +24,7 @@ class InboundEmailProcessor
         private readonly InboundEmailParser $parser,
         private readonly TicketSetupService $ticketSetup,
         private readonly TicketAttachmentService $attachments,
-        private readonly TicketNotifier $notifier,
+        private readonly TicketReplyService $replyService,
         private readonly TicketPolicy $ticketPolicy,
     ) {}
 
@@ -70,14 +70,15 @@ class InboundEmailProcessor
             return null;
         }
 
-        $reply = $ticket->replies()->create([
-            'user_id' => $user->id,
-            'body' => $this->normalizeBody($message->body),
-            'is_internal' => false,
-        ]);
+        $reply = $this->replyService->createReply(
+            $ticket,
+            $user,
+            $this->normalizeBody($message->body),
+            false,
+        );
 
         $this->storeAttachments($ticket, $user, $message->attachments, $reply);
-        $this->notifier->notifyReply($ticket, $reply, $user);
+        $this->replyService->notifyReply($ticket, $reply, $user);
 
         return $ticket;
     }

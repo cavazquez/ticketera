@@ -13,9 +13,9 @@ use App\Models\Department;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Services\TicketActivityLogger;
-use App\Services\TicketAttachmentService;
 use App\Services\TicketNotifier;
 use App\Services\TicketReplyPaginator;
+use App\Services\TicketReplyService;
 use App\Services\TicketSetupService;
 use App\Support\EnumOptions;
 use Illuminate\Http\RedirectResponse;
@@ -109,17 +109,22 @@ class TicketController extends Controller
             $agentsQuery->where('department_id', $user->department_id);
         }
 
-        $activities = $ticket->activities()
+        $activityModels = $ticket->activities()
             ->with('user:id,name')
             ->limit(50)
-            ->get()
-            ->map(fn ($activity) => [
-                'id' => $activity->id,
-                'user_name' => $activity->user_id !== null ? ($activity->user->name ?? 'Sistema') : 'Sistema',
-                'field_label' => $activity->fieldLabel(),
-                'change' => $activity->formattedChange(),
-                'created_at' => $activity->created_at,
-            ]);
+            ->get();
+
+        $assigneeNames = User::query()
+            ->whereIn('id', $activityModels->flatMap->referencedUserIds()->unique()->all())
+            ->pluck('name', 'id');
+
+        $activities = $activityModels->map(fn ($activity) => [
+            'id' => $activity->id,
+            'user_name' => $activity->user_id !== null ? ($activity->user->name ?? 'Sistema') : 'Sistema',
+            'field_label' => $activity->fieldLabel(),
+            'change' => $activity->formattedChange($assigneeNames->all()),
+            'created_at' => $activity->created_at,
+        ]);
 
         return Inertia::render('Panel/Tickets/Show', [
             'ticket' => $ticket,
@@ -172,30 +177,20 @@ class TicketController extends Controller
     public function reply(
         StoreTicketReplyRequest $request,
         Ticket $ticket,
-        TicketNotifier $notifier,
-        TicketActivityLogger $activityLogger,
-        TicketAttachmentService $attachments,
+        TicketReplyService $replyService,
     ): RedirectResponse {
         $this->authorize('reply', $ticket);
 
         $user = $this->requireUser($request);
         $isInternal = $user->isStaff() && $request->boolean('is_internal');
 
-        $reply = $ticket->replies()->create([
-            'user_id' => $user->id,
-            'body' => $request->validated('body'),
-            'is_internal' => $isInternal,
-        ]);
-
-        $attachments->storeMany($ticket, $user, $request->validatedAttachments(), $reply);
-
-        if ($ticket->status === TicketStatus::Open && $user->isStaff() && ! $isInternal) {
-            $previousStatus = $ticket->status;
-            $ticket->update(['status' => TicketStatus::InProgress]);
-            $activityLogger->logChange($ticket, $user, 'status', $previousStatus, $ticket->status);
-        }
-
-        $notifier->notifyReply($ticket, $reply, $user);
+        $replyService->reply(
+            $ticket,
+            $user,
+            $request->validated('body'),
+            $isInternal,
+            $request->validatedAttachments(),
+        );
 
         return back()->with('success', $isInternal ? 'Nota interna agregada.' : 'Respuesta enviada.');
     }
